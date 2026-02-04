@@ -1,0 +1,442 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserStatus {
+  PENDING_OTP
+  ACTIVE
+  SUSPENDED
+}
+
+enum UserRole {
+  STUDENT
+  COMPANY_ADMIN
+  COMPANY_MEMBER
+  UNIVERSITY_ADMIN
+}
+
+enum OrgStatus {
+  PENDING_OTP
+  ACTIVE
+  SUSPENDED
+}
+
+enum OtpPurpose {
+  SIGNUP_VERIFY
+  PASSWORD_RESET
+}
+
+enum StartupStatus {
+  DRAFT
+  SUBMITTED
+  NEEDS_CHANGES
+  APPROVED
+  ARCHIVED
+}
+
+enum OpportunityStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  SHORTLISTED
+  INTERVIEW
+  SELECTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum JoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+// ============================================================================
+// CORE MODELS
+// ============================================================================
+
+model User {
+  id              String      @id @default(uuid())
+  email           String      @unique
+  passwordHash    String
+  role            UserRole
+  status          UserStatus  @default(PENDING_OTP)
+  emailVerifiedAt DateTime?
+  
+  // For company users
+  orgId           String?
+  org             Org?        @relation(fields: [orgId], references: [id])
+  
+  // For students
+  studentProfile  StudentProfile?
+  
+  // Auth
+  refreshTokens   RefreshToken[]
+  
+  // Notifications
+  notifications   Notification[]
+  
+  // Admin relations
+  reports         Report[]
+  auditLogs       AuditLog[]
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([status])
+  @@index([orgId])
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  tokenHash   String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailOtp {
+  id                   String     @id @default(uuid())
+  email                String
+  purpose              OtpPurpose
+  codeHash             String
+  expiresAt            DateTime
+  attempts             Int        @default(0)
+  lastSentAt           DateTime   @default(now())
+  sendCountWindowStart DateTime   @default(now())
+  sendCountInWindow    Int        @default(1)
+  createdAt            DateTime   @default(now())
+  
+  @@index([email, purpose])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// ORGANIZATION MODELS
+// ============================================================================
+
+model Org {
+  id              String    @id @default(uuid())
+  name            String
+  description     String?
+  website         String?
+  logoUrl         String?
+  status          OrgStatus @default(PENDING_OTP)
+  isVerifiedBadge Boolean   @default(false)
+  
+  // Relations
+  members         User[]
+  opportunities   Opportunity[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([status])
+}
+
+// ============================================================================
+// STUDENT MODELS
+// ============================================================================
+
+model StudentProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  firstName   String
+  lastName    String
+  major       String?
+  gradYear    Int?
+  bio         String?
+  skills      String[]
+  resumeUrl   String?
+  linkedinUrl String?
+  githubUrl   String?
+  
+  // Relations
+  portfolioItems     PortfolioItem[]
+  startupMemberships StartupMember[]
+  applications       Application[]
+  joinRequests       JoinRequest[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PortfolioItem {
+  id          String   @id @default(uuid())
+  profileId   String
+  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  url         String?
+  imageUrl    String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([profileId])
+}
+
+// ============================================================================
+// STARTUP MODELS
+// ============================================================================
+
+model Startup {
+  id          String        @id @default(uuid())
+  name        String
+  tagline     String?
+  description String?
+  stage       String?
+  tags        String[]
+  logoUrl     String?
+  status      StartupStatus @default(DRAFT)
+  adminFeedback String?
+  
+  // Relations
+  members      StartupMember[]
+  joinRequests JoinRequest[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@index([status])
+}
+
+model StartupMember {
+  id          String   @id @default(uuid())
+  startupId   String
+  startup     Startup  @relation(fields: [startupId], references: [id], onDelete: Cascade)
+  profileId   String
+  profile     StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  role        String   // 'founder' | 'member'
+  joinedAt    DateTime @default(now())
+  
+  @@unique([startupId, profileId])
+  @@index([startupId])
+  @@index([profileId])
+}
+
+model JoinRequest {
+  id          String           @id @default(uuid())
+  startupId   String
+  startup     Startup          @relation(fields: [startupId], references: [id], onDelete: Cascade)
+  profileId   String
+  profile     StudentProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  message     String?
+  status      JoinRequestStatus @default(PENDING)
+  
+  // Messaging thread (created when accepted)
+  threadId    String?          @unique
+  thread      MessageThread?   @relation(fields: [threadId], references: [id])
+  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  @@index([startupId, status])
+  @@index([profileId])
+}
+
+// ============================================================================
+// OPPORTUNITY MODELS
+// ============================================================================
+
+model Opportunity {
+  id          String            @id @default(uuid())
+  orgId       String
+  org         Org               @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  requirements String?
+  budgetType  String?           // 'paid' | 'unpaid' | 'equity'
+  budgetRange String?
+  tags        String[]
+  status      OpportunityStatus @default(DRAFT)
+  publishedAt DateTime?
+  closedAt    DateTime?
+  
+  // Relations
+  applications Application[]
+  
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  @@index([orgId])
+  @@index([status])
+}
+
+model Application {
+  id            String            @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity       @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  profileId     String
+  profile       StudentProfile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  coverLetter   String?
+  resumeUrl     String?
+  status        ApplicationStatus @default(SUBMITTED)
+  
+  // Messaging thread
+  threadId      String?           @unique
+  thread        MessageThread?    @relation(fields: [threadId], references: [id])
+  
+  // Status history
+  statusHistory ApplicationStatusHistory[]
+  
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@unique([opportunityId, profileId])
+  @@index([opportunityId, status])
+  @@index([profileId])
+}
+
+model ApplicationStatusHistory {
+  id            String            @id @default(uuid())
+  applicationId String
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus
+  changedBy     String            // userId
+  note          String?
+  createdAt     DateTime          @default(now())
+  
+  @@index([applicationId])
+}
+
+// ============================================================================
+// MESSAGING MODELS
+// ============================================================================
+
+model MessageThread {
+  id          String       @id @default(uuid())
+  
+  // Relations
+  messages    Message[]
+  joinRequest JoinRequest?
+  application Application?
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Message {
+  id        String        @id @default(uuid())
+  threadId  String
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId  String        // userId
+  content   String
+  createdAt DateTime      @default(now())
+  
+  @@index([threadId, createdAt])
+}
+
+// ============================================================================
+// NOTIFICATION MODEL
+// ============================================================================
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String
+  title     String
+  message   String?
+  data      Json?
+  readAt    DateTime?
+  
+  createdAt DateTime  @default(now())
+  
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+// ============================================================================
+// MODERATION MODELS
+// ============================================================================
+
+model Report {
+  id             String       @id @default(uuid())
+  reporterId     String       // userId
+  reporter       User         @relation(fields: [reporterId], references: [id])
+  targetType     String       // 'startup' | 'opportunity' | 'user' | 'message'
+  targetId       String
+  reporterReason String
+  status         ReportStatus @default(PENDING)
+  resolution     String?
+  adminNotes     String?
+  resolvedBy     String?      // admin userId
+  resolvedAt     DateTime?
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  @@index([status])
+  @@index([reporterId])
+  @@index([targetType, targetId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   // admin userId who performed the action
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  targetType String?
+  targetId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+// ============================================================================
+// FILE MODEL
+// ============================================================================
+
+model File {
+  id          String   @id @default(uuid())
+  s3Key       String   @unique  // S3 key
+  filename    String
+  mimeType    String
+  sizeBytes   Int
+  context     String?  // 'startup_logo' | 'resume' | 'portfolio' | 'opportunity'
+  contextId   String?
+  uploadedBy  String   // userId who uploaded
+  createdAt   DateTime @default(now())
+  
+  @@index([uploadedBy])
+  @@index([context, contextId])
+}
