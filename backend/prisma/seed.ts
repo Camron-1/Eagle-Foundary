@@ -56,10 +56,7 @@ async function main() {
 
     // Create Org first
     const org = await prisma.org.upsert({
-        where: { id: 'default-org-id' }, // We'll rely on a fixed ID or finding by name if schema allows, but mostly we create new if not exists. 
-        // Actually, finding by ID for upsert is tricky if we don't have a fixed uuid. 
-        // Let's check if the user exists first to determine if we need to create the org structure.
-        // For simplicity in this seed, let's just create if the email doesn't exist.
+        where: { id: 'default-org-id' },
         update: {},
         create: {
             name: 'TechCorp Solutions',
@@ -69,9 +66,6 @@ async function main() {
             isVerifiedBadge: true,
         }
     });
-
-    // Since upsert requires a unique constraint, and Org might not have unique name, let's do a findFirst or just handle the user relation.
-    // Better approach for seed idempotency:
 
     const existingCompanyUser = await prisma.user.findUnique({ where: { email: companyEmail } });
 
