@@ -124,7 +124,7 @@ export default function SecurityPage(): JSX.Element {
               </p>
             </div>
 
-            <Button variant="outline" onClick={() => setRegenOpen(true)}>
+            <Button variant="ghost" onClick={() => setRegenOpen(true)}>
               Regenerate backup codes
             </Button>
           </div>
@@ -139,7 +139,8 @@ export default function SecurityPage(): JSX.Element {
 
         <div className="mb-4 flex flex-wrap justify-end gap-2">
           <Button
-            variant="outline"
+            variant="primary"
+            withBorderEffect={false}
             onClick={() => revokeOthersMutation.mutate()}
             disabled={revokeOthersMutation.isPending || activeSessionCount === 0}
           >

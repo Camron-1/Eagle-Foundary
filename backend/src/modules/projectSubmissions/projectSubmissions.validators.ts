@@ -14,7 +14,7 @@ export const projectSubmissionFormAnswersSchema = z
     .nullable();
 
 export const createProjectSubmissionSchema = z.object({
-    coverLetter: z.string().max(3000).optional().nullable(),
+    coverLetter: z.string().max(5000).optional().nullable(),
     resumeUrl: httpUrlSchema.optional().nullable(),
     formAnswers: projectSubmissionFormAnswersSchema,
 });

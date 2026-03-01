@@ -238,6 +238,7 @@ export interface MessageThread {
   isLegacyPlaintextThread?: boolean;
   joinRequest?: JoinRequest;
   application?: Application;
+  projectSubmission?: ProjectSubmission;
   messages?: Message[];
   lastMessage?: Message;
 }

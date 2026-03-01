@@ -103,7 +103,7 @@ export default function OrganizationsPage(): JSX.Element {
           description="Try a different search or check back later."
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {orgs.map((org) => (
             <div
               key={org.id}
@@ -111,16 +111,16 @@ export default function OrganizationsPage(): JSX.Element {
               tabIndex={0}
               onClick={() => navigate(`/organizations/${org.id}`)}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/organizations/${org.id}`)}
-              className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-2xl"
+              className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-2xl h-full"
             >
-              <Card interactive>
-              <h3 className="text-lg font-semibold text-white">{org.name}</h3>
-              <p className="mt-2 text-sm text-zinc-400 line-clamp-3">
-                {truncate(org.description, 120)}
-              </p>
-              <div className="mt-3">
-                <Badge>{org.status}</Badge>
-              </div>
+              <Card interactive className="h-full flex flex-col">
+                <h3 className="text-lg font-semibold text-white">{org.name}</h3>
+                <p className="mt-2 flex-1 text-sm text-zinc-400 line-clamp-3">
+                  {truncate(org.description, 120)}
+                </p>
+                <div className="mt-3">
+                  <Badge>{org.status}</Badge>
+                </div>
               </Card>
             </div>
           ))}

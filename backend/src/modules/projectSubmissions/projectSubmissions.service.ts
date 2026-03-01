@@ -15,6 +15,7 @@ import {
     UpdateProjectSubmissionStatusInput,
 } from './projectSubmissions.validators.js';
 import { decryptJsonValue, encryptJsonValue, type EncryptedEnvelope } from '../../utils/fieldEncryption.js';
+import { logger } from '../../connectors/logger.js';
 
 const SENSITIVE_FORM_ANSWER_KEYS = new Set([
     'address',
@@ -172,15 +173,22 @@ export async function withdrawProjectSubmission(userId: string, projectSubmissio
         throw new AppError(ErrorCode.CONFLICT, 'Project submission already withdrawn', 400);
     }
 
-    await projectSubmissionsRepo.addStatusHistory({
-        projectSubmissionId,
-        fromStatus: submission.status,
-        toStatus: ApplicationStatus.WITHDRAWN,
-        changedBy: userId,
-    });
+    return db.$transaction(async (tx) => {
+        await projectSubmissionsRepo.addStatusHistory(
+            {
+                projectSubmissionId,
+                fromStatus: submission.status,
+                toStatus: ApplicationStatus.WITHDRAWN,
+                changedBy: userId,
+            },
+            tx
+        );
 
-    return projectSubmissionsRepo.updateProjectSubmission(projectSubmissionId, {
-        status: ApplicationStatus.WITHDRAWN,
+        return projectSubmissionsRepo.updateProjectSubmission(
+            projectSubmissionId,
+            { status: ApplicationStatus.WITHDRAWN },
+            tx
+        );
     });
 }
 
@@ -237,8 +245,11 @@ export async function getProjectSubmissionById(orgId: string, projectSubmissionI
                 ...submission,
                 formAnswers: mergedFormAnswers,
             };
-        } catch {
-            // Keep endpoint resilient during mixed-data rollout.
+        } catch (err) {
+            logger.warn(
+                { err, submissionId: submission.id, projectId: submission.projectId, profileId: submission.profileId },
+                'Failed to decrypt sensitive form answers'
+            );
         }
     }
 
@@ -267,23 +278,34 @@ export async function updateProjectSubmissionStatus(
 
     const newStatus = data.status as ApplicationStatus;
 
-    let threadId = submission.threadId;
-    if (!threadId && (newStatus === ApplicationStatus.SHORTLISTED || newStatus === ApplicationStatus.SELECTED)) {
-        const thread = await db.messageThread.create({ data: {} });
-        threadId = thread.id;
-    }
+    const { updated, threadId } = await db.$transaction(async (tx) => {
+        let txThreadId = submission.threadId;
+        if (!txThreadId && (newStatus === ApplicationStatus.SHORTLISTED || newStatus === ApplicationStatus.SELECTED)) {
+            const thread = await tx.messageThread.create({ data: {} });
+            txThreadId = thread.id;
+        }
 
-    await projectSubmissionsRepo.addStatusHistory({
-        projectSubmissionId,
-        fromStatus: submission.status,
-        toStatus: newStatus,
-        changedBy: userId,
-        note: data.note,
-    });
+        await projectSubmissionsRepo.addStatusHistory(
+            {
+                projectSubmissionId,
+                fromStatus: submission.status,
+                toStatus: newStatus,
+                changedBy: userId,
+                note: data.note,
+            },
+            tx
+        );
 
-    const updated = await projectSubmissionsRepo.updateProjectSubmission(projectSubmissionId, {
-        status: newStatus,
-        ...(threadId ? { threadId } : {}),
+        const txUpdated = await projectSubmissionsRepo.updateProjectSubmission(
+            projectSubmissionId,
+            {
+                status: newStatus,
+                ...(txThreadId ? { threadId: txThreadId } : {}),
+            },
+            tx
+        );
+
+        return { updated: txUpdated, threadId: txThreadId };
     });
 
     const event = buildProjectSubmissionStatusChangedEvent(

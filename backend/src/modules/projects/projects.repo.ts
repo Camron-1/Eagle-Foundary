@@ -115,7 +115,7 @@ export async function listPublishedProjects(
 
     const projects = await db.project.findMany({
         where,
-        orderBy: { publishedAt: 'desc' },
+        orderBy: [{ publishedAt: 'desc' }, { id: 'desc' }],
         take,
         ...(cursor
             ? {
@@ -149,7 +149,7 @@ export async function listByOrgId(
             orgId,
             ...(status ? { status } : {}),
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take,
         ...(cursor
             ? {

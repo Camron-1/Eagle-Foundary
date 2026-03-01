@@ -2,8 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import { endpoints } from '@/lib/api/endpoints';
+import { ApiError, parseApiError } from '@/lib/api/errors';
 import type { ApplicationStatus, ProjectSubmission } from '@/lib/api/types';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { TableSkeleton } from '@/components/ui/skeleton';
@@ -22,7 +24,7 @@ export default function ProjectSubmissionsPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: project, isLoading: projectLoading } = useQuery({
+  const { data: project, isLoading: projectLoading, isError: projectError, error: projectFetchError } = useQuery({
     queryKey: ['projects', id],
     queryFn: async () => {
       const res = await api.get(endpoints.projects.detail(id!));
@@ -32,7 +34,7 @@ export default function ProjectSubmissionsPage(): JSX.Element {
     enabled: !!id,
   });
 
-  const { data: submissions = [], isLoading: submissionsLoading } = useQuery({
+  const { data: submissions = [], isLoading: submissionsLoading, isError: submissionsError, error: submissionsFetchError } = useQuery({
     queryKey: ['projects', id, 'submissions'],
     queryFn: async () => {
       const res = await api.get<{ data?: ProjectSubmissionWithProfile[] } | ProjectSubmissionWithProfile[]>(
@@ -45,6 +47,7 @@ export default function ProjectSubmissionsPage(): JSX.Element {
   });
 
   const isLoading = projectLoading || submissionsLoading;
+  const hasError = projectError || submissionsError;
 
   const columns: Column<ProjectSubmissionWithProfile & Record<string, unknown>>[] = [
     {
@@ -115,6 +118,14 @@ export default function ProjectSubmissionsPage(): JSX.Element {
 
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
+      ) : hasError ? (
+        <Card>
+          <p className="text-red-400">
+            {projectError
+              ? `Failed to load project: ${(projectFetchError instanceof ApiError ? projectFetchError : parseApiError(projectFetchError)).message}`
+              : `Failed to load submissions: ${(submissionsFetchError instanceof ApiError ? submissionsFetchError : parseApiError(submissionsFetchError)).message}`}
+          </p>
+        </Card>
       ) : submissions.length === 0 ? (
         <EmptyState title="No submissions" description="No student has submitted for this project yet." />
       ) : (

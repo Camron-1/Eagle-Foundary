@@ -19,8 +19,8 @@ export function FinalCtaSection(): JSX.Element {
             Join Eagle-Foundry
             <ArrowUpRight size={14} />
           </Button>
-          <Button variant="ghost" asChild>
-            <a href="mailto:contact@eagle-foundry.example">Contact Sales</a>
+          <Button variant="ghost" onClick={() => window.location.href = 'mailto:contact@eagle-foundry.example'}>
+            Contact Sales
           </Button>
         </div>
       </div>

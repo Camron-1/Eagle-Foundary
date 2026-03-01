@@ -57,7 +57,7 @@ export default function ProjectsBoardPage(): JSX.Element {
     {
       key: 'status',
       header: 'Status',
-      render: (row) => <Badge>{row.status as ProjectStatus}</Badge>,
+      render: (row) => <Badge>{row.status ?? '—'}</Badge>,
     },
     {
       key: 'actions',

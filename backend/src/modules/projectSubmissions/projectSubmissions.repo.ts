@@ -1,5 +1,7 @@
 import { db } from '../../connectors/db.js';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
+
+type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
 
 const ApplicationStatusValues = {
     SUBMITTED: 'SUBMITTED',
@@ -87,22 +89,28 @@ export async function updateProjectSubmission(
     data: {
         status?: ApplicationStatusType;
         threadId?: string;
-    }
+    },
+    tx?: TransactionClient
 ) {
-    return db.projectSubmission.update({
+    const client = tx ?? db;
+    return client.projectSubmission.update({
         where: { id },
         data,
     });
 }
 
-export async function addStatusHistory(data: {
-    projectSubmissionId: string;
-    fromStatus: ApplicationStatusType | null;
-    toStatus: ApplicationStatusType;
-    changedBy: string;
-    note?: string | null;
-}) {
-    return db.projectSubmissionStatusHistory.create({ data });
+export async function addStatusHistory(
+    data: {
+        projectSubmissionId: string;
+        fromStatus: ApplicationStatusType | null;
+        toStatus: ApplicationStatusType;
+        changedBy: string;
+        note?: string | null;
+    },
+    tx?: TransactionClient
+) {
+    const client = tx ?? db;
+    return client.projectSubmissionStatusHistory.create({ data });
 }
 
 export async function listByProfileId(

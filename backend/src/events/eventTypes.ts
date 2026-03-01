@@ -28,6 +28,7 @@ export const EventType = {
 
     // Project events
     PROJECT_PUBLISHED: 'project.published',
+    PROJECT_CLOSED: 'project.closed',
     PROJECT_SUBMISSION_SUBMITTED: 'project_submission.submitted',
     PROJECT_SUBMISSION_STATUS_CHANGED: 'project_submission.status_changed',
 } as const;

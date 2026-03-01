@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import { endpoints } from '@/lib/api/endpoints';
+import { ApiError, parseApiError } from '@/lib/api/errors';
 import type { Project, ProjectStatus } from '@/lib/api/types';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { DataTable, type Column } from '@/components/ui/data-table';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FilterBar } from '@/components/ui/filter-bar';
@@ -25,7 +27,7 @@ export default function ProjectsPage(): JSX.Element {
 
   const cursor = cursorStack[page - 1];
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['projects', 'list', search, cursor],
     queryFn: async () => {
       const params: Record<string, string | number | undefined> = {
@@ -105,6 +107,12 @@ export default function ProjectsPage(): JSX.Element {
 
       {isLoading ? (
         <TableSkeleton rows={5} cols={4} />
+      ) : isError ? (
+        <Card>
+          <p className="text-red-400">
+            Failed to load projects: {(error instanceof ApiError ? error : parseApiError(error)).message}
+          </p>
+        </Card>
       ) : projects.length === 0 ? (
         <EmptyState title="No projects found" description="Try a different search or check back later." />
       ) : (

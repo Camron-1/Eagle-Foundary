@@ -4,7 +4,7 @@ import * as projectsRepo from './projects.repo.js';
 import { AppError, ForbiddenError, NotFoundError } from '../../middlewares/errorHandler.js';
 import { ErrorCode } from '../../utils/response.js';
 import { publish } from '../../events/publish.js';
-import { buildProjectPublishedEvent } from '../../events/builders.js';
+import { buildProjectPublishedEvent, buildProjectClosedEvent } from '../../events/builders.js';
 import { CreateProjectInput, ListProjectsQuery, UpdateProjectInput } from './projects.validators.js';
 
 function normalizeDeadline(value?: string | null): Date | null | undefined {
@@ -80,6 +80,10 @@ export async function updateProject(projectId: string, orgId: string, data: Upda
         throw new AppError(ErrorCode.CONFLICT, 'Cannot edit closed projects', 400);
     }
 
+    if (project.org.status !== OrgStatus.ACTIVE || project.org.verificationStatus !== 'APPROVED') {
+        throw new AppError(ErrorCode.ORG_SUSPENDED, 'Organization is not active', 403);
+    }
+
     return projectsRepo.updateProject(projectId, {
         ...(data.title !== undefined ? { title: data.title } : {}),
         ...(data.description !== undefined ? { description: data.description } : {}),
@@ -106,6 +110,10 @@ export async function publishProject(projectId: string, orgId: string) {
 
     if (project.status !== ProjectStatus.DRAFT) {
         throw new AppError(ErrorCode.CONFLICT, 'Only draft projects can be published', 400);
+    }
+
+    if (project.org.status !== OrgStatus.ACTIVE || project.org.verificationStatus !== 'APPROVED') {
+        throw new AppError(ErrorCode.ORG_SUSPENDED, 'Organization is not active', 403);
     }
 
     if (!project.title || !project.description) {
@@ -142,10 +150,19 @@ export async function closeProject(projectId: string, orgId: string) {
         throw new AppError(ErrorCode.CONFLICT, 'Only published projects can be closed', 400);
     }
 
-    return projectsRepo.updateProject(projectId, {
+    if (project.org.status !== OrgStatus.ACTIVE || project.org.verificationStatus !== 'APPROVED') {
+        throw new AppError(ErrorCode.ORG_SUSPENDED, 'Organization is not active', 403);
+    }
+
+    const updated = await projectsRepo.updateProject(projectId, {
         status: ProjectStatus.CLOSED,
         closedAt: new Date(),
     });
+
+    const event = buildProjectClosedEvent(projectId, project.title, project.orgId, project.org.name);
+    await publish(event.type, event.payload);
+
+    return updated;
 }
 
 export async function listProjects(query: ListProjectsQuery) {

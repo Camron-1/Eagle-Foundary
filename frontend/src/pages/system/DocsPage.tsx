@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function DocsPage(): JSX.Element {
+  const navigate = useNavigate();
   return (
     <div className="relative min-h-screen bg-black text-white">
       <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.06]" />
@@ -14,9 +15,6 @@ export default function DocsPage(): JSX.Element {
             <img src="/assets/brand/logo-dark-512.png" alt="Eagle-Foundry" className="h-8 w-8 rounded-full" />
             <span className="text-sm font-semibold tracking-wide text-zinc-100">Eagle-Foundry</span>
           </Link>
-          <Button variant="ghost" asChild>
-            <Link to="/">Back to home</Link>
-          </Button>
         </header>
 
         <div className="ef-card rounded-2xl border border-white/10 bg-zinc-950/80 p-8 backdrop-blur-lg md:p-12">
@@ -50,11 +48,11 @@ export default function DocsPage(): JSX.Element {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-4 border-t border-white/10 pt-8">
-            <Button withBorderEffect={false} asChild>
-              <Link to="/sign-up">Get Started</Link>
+            <Button withBorderEffect={false} onClick={() => navigate('/sign-up')}>
+              Get Started
             </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/">Back to landing</Link>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              Back
             </Button>
           </div>
         </div>

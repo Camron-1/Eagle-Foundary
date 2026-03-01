@@ -55,7 +55,7 @@ export default function ProjectEditorPage(): JSX.Element {
   const [newQuestion, setNewQuestion] = useState('');
   const [newQuestionRequired, setNewQuestionRequired] = useState(false);
 
-  const { data: project, isLoading } = useQuery({
+  const { data: project, isLoading, isError, error } = useQuery({
     queryKey: ['projects', id],
     queryFn: async () => {
       const res = await api.get<{ data?: ProjectWithQuestions } | ProjectWithQuestions>(endpoints.projects.detail(id!));
@@ -225,6 +225,23 @@ export default function ProjectEditorPage(): JSX.Element {
     );
   }
 
+  if (!isNew && isError) {
+    const apiErr = error instanceof ApiError ? error : parseApiError(error);
+    return (
+      <div className="space-y-8">
+        <header>
+          <h1 className="ef-heading-gradient text-4xl font-semibold">Edit Project</h1>
+        </header>
+        <Card>
+          <p className="text-red-400">Failed to load project: {apiErr.message}</p>
+          <Button type="button" variant="ghost" className="mt-4" onClick={() => navigate('/company/projects')}>
+            Go Back
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <header>
@@ -333,12 +350,12 @@ export default function ProjectEditorPage(): JSX.Element {
               {savePending ? 'Saving...' : 'Save Draft'}
             </Button>
             {!isNew && project?.status === 'DRAFT' && (
-              <Button type="button" variant="ghost" onClick={() => publishMutation.mutate()} disabled={publishMutation.isPending}>
+              <Button type="button" variant="ghost" onClick={() => publishMutation.mutate()} disabled={savePending || publishMutation.isPending}>
                 {publishMutation.isPending ? 'Publishing...' : 'Publish'}
               </Button>
             )}
             {!isNew && project?.status === 'PUBLISHED' && (
-              <Button type="button" variant="ghost" onClick={() => closeMutation.mutate()} disabled={closeMutation.isPending}>
+              <Button type="button" variant="ghost" onClick={() => closeMutation.mutate()} disabled={savePending || closeMutation.isPending}>
                 {closeMutation.isPending ? 'Closing...' : 'Close'}
               </Button>
             )}

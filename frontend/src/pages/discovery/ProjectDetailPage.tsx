@@ -56,9 +56,11 @@ export default function ProjectDetailPage(): JSX.Element {
   const { data: mySubmissions = [] } = useQuery({
     queryKey: ['project-submissions', 'me'],
     queryFn: async () => {
-      const res = await api.get<{ data?: ProjectSubmission[] }>(endpoints.projectSubmissions.me);
+      const res = await api.get<{ data?: ProjectSubmission[] } | ProjectSubmission[]>(endpoints.projectSubmissions.me);
       const body = res.data;
-      return (body && typeof body === 'object' && 'data' in body ? body.data : body) ?? [];
+      if (body && typeof body === 'object' && 'data' in body) return body.data ?? [];
+      if (Array.isArray(body)) return body;
+      return [];
     },
     enabled: isStudent,
   });
@@ -227,6 +229,7 @@ export default function ProjectDetailPage(): JSX.Element {
                   submitMutation.isPending ||
                   !formFirstName.trim() ||
                   !formLastName.trim() ||
+                  !formAddress.trim() ||
                   customQuestions.some((q) => q.required && !customAnswers[q.id]?.trim())
                 }
                 onClick={() => {

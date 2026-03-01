@@ -317,6 +317,26 @@ export function buildProjectPublishedEvent(
 }
 
 /**
+ * Build project closed event payload
+ */
+export function buildProjectClosedEvent(
+    projectId: string,
+    projectTitle: string,
+    orgId: string,
+    orgName: string
+): { type: string; payload: ProjectEventPayload } {
+    return {
+        type: EventType.PROJECT_CLOSED,
+        payload: {
+            projectId,
+            projectTitle,
+            orgId,
+            orgName,
+        },
+    };
+}
+
+/**
  * Build project submission created event payload
  */
 export function buildProjectSubmissionSubmittedEvent(
