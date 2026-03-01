@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as messagingService from './messaging.service.js';
 import { success, created, paginated } from '../../utils/response.js';
-import { SendMessageInput } from './messaging.validators.js';
+import { RegisterMessageKeyInput, SendMessageInput } from './messaging.validators.js';
 import { parseLimit } from '../../utils/pagination.js';
 
 /**
@@ -19,6 +19,54 @@ export async function sendMessage(
             req.body
         );
         created(res, message);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /messages/keys/register
+ */
+export async function registerMessageKey(
+    req: Request<unknown, unknown, RegisterMessageKeyInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const key = await messagingService.registerMessageKey(req.user!.userId, req.body);
+        success(res, key);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /messages/keys/me
+ */
+export async function getMyMessageKey(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const key = await messagingService.getMyMessageKey(req.user!.userId);
+        success(res, key);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /messages/threads/:id/crypto-context
+ */
+export async function getThreadCryptoContext(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const context = await messagingService.getThreadCryptoContext(req.user!.userId, req.params.id);
+        success(res, context);
     } catch (error) {
         next(error);
     }

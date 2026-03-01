@@ -1,4 +1,5 @@
 import { db } from '../../connectors/db.js';
+import type { Prisma } from '@prisma/client';
 
 // Using const values that match Prisma enum values
 const ApplicationStatusValues = {
@@ -12,6 +13,14 @@ const ApplicationStatusValues = {
 
 type ApplicationStatusType = (typeof ApplicationStatusValues)[keyof typeof ApplicationStatusValues];
 
+function toInputJson(value: Record<string, unknown> | null | undefined): Prisma.InputJsonValue | undefined {
+    if (value == null) {
+        return undefined;
+    }
+
+    return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+}
+
 /**
  * Create application
  */
@@ -21,6 +30,7 @@ export async function createApplication(data: {
     coverLetter?: string | null;
     resumeUrl?: string | null;
     formAnswers?: Record<string, unknown> | null;
+    sensitivePayloadEncrypted?: Record<string, unknown> | null;
 }) {
     return db.application.create({
         data: {
@@ -28,7 +38,8 @@ export async function createApplication(data: {
             profileId: data.profileId,
             coverLetter: data.coverLetter,
             resumeUrl: data.resumeUrl,
-            formAnswers: data.formAnswers ?? undefined,
+            formAnswers: toInputJson(data.formAnswers),
+            sensitivePayloadEncrypted: toInputJson(data.sensitivePayloadEncrypted),
             status: 'SUBMITTED',
             statusHistory: {
                 create: {

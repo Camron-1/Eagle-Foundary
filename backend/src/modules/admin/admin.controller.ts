@@ -3,9 +3,11 @@ import * as adminService from './admin.service.js';
 import { success, paginated } from '../../utils/response.js';
 import { parseLimit } from '../../utils/pagination.js';
 import {
+    ListOrgVerificationsQuery,
+    ReviewOrgVerificationInput,
     ReviewStartupInput,
-    UpdateUserStatusInput,
     UpdateOrgStatusInput,
+    UpdateUserStatusInput,
 } from './admin.validators.js';
 
 /**
@@ -97,6 +99,22 @@ export async function updateUserStatus(
 }
 
 /**
+ * POST /admin/users/:id/mfa/reset
+ */
+export async function resetUserMfa(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await adminService.resetUserMfa(req.user!.userId, req.params.id);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
  * GET /admin/orgs
  */
 export async function listOrgs(
@@ -135,6 +153,62 @@ export async function updateOrgStatus(
             req.body
         );
         success(res, org);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /admin/orgs/verifications
+ */
+export async function listOrgVerifications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const query: ListOrgVerificationsQuery = {
+            cursor: req.query.cursor as string | undefined,
+            limit: parseLimit(req.query.limit),
+            status: req.query.status as ListOrgVerificationsQuery['status'],
+        };
+        const result = await adminService.listOrgVerifications(query);
+        paginated(res, result.items, {
+            nextCursor: result.nextCursor,
+            hasMore: result.hasMore,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /admin/orgs/:id/verification-docs
+ */
+export async function getOrgVerificationDocuments(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await adminService.getOrgVerificationDocuments(req.params.id);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * PATCH /admin/orgs/:id/verification
+ */
+export async function reviewOrgVerification(
+    req: Request<{ id: string }, unknown, ReviewOrgVerificationInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await adminService.reviewOrgVerification(req.user!.userId, req.params.id, req.body);
+        success(res, result);
     } catch (error) {
         next(error);
     }

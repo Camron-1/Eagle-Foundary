@@ -1,78 +1,79 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// Unmock DB for integration tests
-vi.unmock('../../src/connectors/db');
+const RUN_DB_INTEGRATION_TESTS = process.env.RUN_DB_INTEGRATION_TESTS === 'true';
 
-import request from 'supertest';
-import { app } from '../../src/app.js';
-import { db } from '../../src/connectors/db.js';
-import { hashPassword } from '../../src/utils/security.js';
+// Unmock DB only for real integration runs.
+if (RUN_DB_INTEGRATION_TESTS) {
+    vi.unmock('../../src/connectors/db');
+}
 
-describe('Auth Integration Tests', () => {
+describe.skipIf(!RUN_DB_INTEGRATION_TESTS)('Auth Integration Tests', async () => {
+    const request = (await import('supertest')).default;
+    const { app } = await import('../../src/app.js');
+    const { db } = await import('../../src/connectors/db.js');
+
     const testStudent = {
-        email: 'integration_test@test.edu',
+        email: 'integration_test_student@test.edu',
         password: 'TestPassword123!',
         firstName: 'Test',
-        lastName: 'User'
+        lastName: 'Student',
     };
 
     beforeAll(async () => {
-        // Clean up potentially existing test user
         await db.user.deleteMany({ where: { email: testStudent.email } });
     });
 
     afterAll(async () => {
-        // Clean up
         await db.user.deleteMany({ where: { email: testStudent.email } });
         await db.$disconnect();
     });
 
-    it('should register a new student', async () => {
+    it('registers a new student account', async () => {
         const res = await request(app)
             .post('/api/auth/student/signup')
             .send(testStudent);
 
         expect(res.status).toBe(201);
-        expect(res.body).toHaveProperty('success', true);
-        expect(res.body.data).toHaveProperty('userId');
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.userId).toBeTruthy();
     });
 
-    it('should prevent duplicate registration', async () => {
+    it('prevents duplicate student registration', async () => {
         const res = await request(app)
             .post('/api/auth/student/signup')
             .send(testStudent);
 
-        expect(res.status).toBe(409); // Conflict
-        expect(res.body).toHaveProperty('success', false);
+        expect(res.status).toBe(409);
+        expect(res.body.success).toBe(false);
         expect(res.body.error.code).toBe('ALREADY_EXISTS');
     });
 
-    it('should login with correct credentials (after manual verification simulation)', async () => {
-        // Manually verify the user in DB since we can't easily get the OTP in tests without mocking
+    it('returns MFA setup challenge after successful login for user without MFA', async () => {
         await db.user.update({
             where: { email: testStudent.email },
-            data: { status: 'ACTIVE' }
+            data: { status: 'ACTIVE' },
         });
 
         const res = await request(app)
             .post('/api/auth/login')
             .send({
                 email: testStudent.email,
-                password: testStudent.password
+                password: testStudent.password,
             });
 
         expect(res.status).toBe(200);
-        expect(res.body.data).toHaveProperty('accessToken');
-        expect(res.body.data).not.toHaveProperty('refreshToken');
-        expect(res.headers['set-cookie']).toBeDefined();
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.nextStep).toBe('MFA_SETUP');
+        expect(typeof res.body.data.challengeToken).toBe('string');
+        expect(res.body.data.accessToken).toBeUndefined();
     });
 
-    it('should fail login with incorrect password', async () => {
+    it('fails login with incorrect password', async () => {
         const res = await request(app)
             .post('/api/auth/login')
             .send({
                 email: testStudent.email,
-                password: 'WrongPassword123!'
+                password: 'WrongPassword123!',
             });
 
         expect(res.status).toBe(401);

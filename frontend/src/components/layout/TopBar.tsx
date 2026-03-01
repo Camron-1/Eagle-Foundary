@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Search, User, Menu } from 'lucide-react';
+import { Bell, LogOut, Search, User, Menu, Shield } from 'lucide-react';
 import { useAuth } from '@/store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { api, unwrapApiData } from '@/lib/api/client';
@@ -71,7 +71,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps): JSX.Element {
   const initials = user?.email?.charAt(0).toUpperCase() ?? 'U';
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-black/60 px-4 backdrop-blur-md">
+    <header className="relative z-[70] flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-black/60 px-4 backdrop-blur-md">
       <div className="flex items-center gap-3">
         <button onClick={onToggleSidebar} className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white lg:hidden">
           <Menu size={18} />
@@ -117,16 +117,25 @@ export function TopBar({ onToggleSidebar }: TopBarProps): JSX.Element {
             <div
               id="profile-menu"
               role="menu"
-              className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-white/10 bg-zinc-950/95 p-1.5 shadow-xl backdrop-blur-lg"
+              className="absolute right-0 top-full z-[80] mt-1 w-48 rounded-xl border border-white/10 bg-zinc-950/95 p-1.5 shadow-xl backdrop-blur-lg"
             >
               <Link
                 role="menuitem"
-                to={user?.role === 'STUDENT' ? '/student/profile' : '/company/org'}
+                to={user?.role === 'STUDENT' ? '/student/profile' : user?.role === 'UNIVERSITY_ADMIN' ? '/admin' : '/company/org'}
                 onClick={() => setProfileOpen(false)}
                 className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <User size={14} />
                 Profile
+              </Link>
+              <Link
+                role="menuitem"
+                to="/settings/security"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+              >
+                <Shield size={14} />
+                Security
               </Link>
               <button
                 role="menuitem"

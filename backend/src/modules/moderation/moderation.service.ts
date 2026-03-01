@@ -33,12 +33,24 @@ export async function createReport(userId: string, data: CreateReportInput) {
         throw new NotFoundError('Target');
     }
 
+    if (data.evidenceMessageId) {
+        const evidenceMessageExists = await db.message.findUnique({
+            where: { id: data.evidenceMessageId },
+            select: { id: true },
+        });
+        if (!evidenceMessageExists) {
+            throw new NotFoundError('Evidence message');
+        }
+    }
+
     return db.report.create({
         data: {
             reporterId: userId,
             targetType: data.targetType,
             targetId: data.targetId,
             reporterReason: data.reporterReason,
+            evidenceText: data.evidenceText,
+            evidenceMessageId: data.evidenceMessageId,
             status: 'PENDING',
         },
     });

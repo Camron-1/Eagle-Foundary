@@ -103,6 +103,17 @@ export function errorHandler(
             error(res, ErrorCode.NOT_FOUND, 'Resource not found', 404);
             return;
         }
+
+        if (prismaError.code === 'P2022') {
+            // Column does not exist (usually schema drift / pending migration)
+            error(
+                res,
+                ErrorCode.DB_SCHEMA_MISMATCH,
+                'Database schema is out of date. Run the latest backend migrations and try again.',
+                500
+            );
+            return;
+        }
     }
 
     // Handle JWT errors

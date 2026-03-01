@@ -1,11 +1,18 @@
-import { UserRole, UserStatus, OrgStatus } from '@prisma/client';
+import crypto from 'crypto';
+import { OrgJoinRequestStatus, OrgStatus, OrgVerificationStatus, UserRole, UserStatus } from '@prisma/client';
 import { db } from '../../connectors/db.js';
 import * as orgsRepo from './orgs.repo.js';
-import { AppError, NotFoundError, ForbiddenError } from '../../middlewares/errorHandler.js';
+import { AppError, ForbiddenError, NotFoundError } from '../../middlewares/errorHandler.js';
 import { ErrorCode } from '../../utils/response.js';
 import { hashPassword } from '../../utils/security.js';
-import { isValidCompanyEmail, normalizeEmail } from '../../utils/emailRules.js';
-import { UpdateOrgInput, AddMemberInput, ListOrgsQuery } from './orgs.validators.js';
+import { getEmailDomain, isValidCompanyEmail, normalizeEmail } from '../../utils/emailRules.js';
+import {
+    AddMemberInput,
+    ListOrgJoinRequestsQuery,
+    ListOrgsQuery,
+    ReviewOrgJoinRequestInput,
+    UpdateOrgInput,
+} from './orgs.validators.js';
 
 /**
  * Get current user's org
@@ -56,13 +63,13 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
         throw new NotFoundError('Organization');
     }
 
-    if (org.status !== OrgStatus.ACTIVE) {
-        throw new AppError(ErrorCode.ORG_SUSPENDED, 'Organization is not active', 403);
+    if (org.status !== OrgStatus.ACTIVE || org.verificationStatus !== OrgVerificationStatus.APPROVED) {
+        throw new AppError(ErrorCode.ORG_VERIFICATION_PENDING, 'Organization is not approved for member management', 403);
     }
 
     const email = normalizeEmail(data.email);
+    const domain = getEmailDomain(email);
 
-    // Validate company email
     if (!isValidCompanyEmail(email)) {
         throw new AppError(
             ErrorCode.BLOCKED_EMAIL_DOMAIN,
@@ -71,7 +78,14 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
         );
     }
 
-    // Check if user already exists
+    if (!domain || !org.verifiedDomains.includes(domain)) {
+        throw new AppError(
+            ErrorCode.INVALID_EMAIL_DOMAIN,
+            'Email domain is not approved for this organization',
+            400
+        );
+    }
+
     const existingUser = await db.user.findUnique({ where: { email } });
 
     if (existingUser) {
@@ -79,13 +93,11 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
             throw new AppError(ErrorCode.CONFLICT, 'User is already part of an organization', 409);
         }
 
-        // Add existing user to org
         await orgsRepo.addMember(orgId, existingUser.id, data.role as 'COMPANY_ADMIN' | 'COMPANY_MEMBER');
 
         return { userId: existingUser.id, invited: false };
     }
 
-    // Create new user with temporary password (they'll need to reset)
     const tempPassword = await hashPassword(crypto.randomUUID());
 
     const newUser = await db.user.create({
@@ -97,8 +109,6 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
             orgId,
         },
     });
-
-    // TODO: Send invitation email via SQS event
 
     return { userId: newUser.id, invited: true };
 }
@@ -113,12 +123,10 @@ export async function removeMember(orgId: string, removerId: string, memberId: s
         throw new NotFoundError('Organization');
     }
 
-    // Can't remove yourself
     if (memberId === removerId) {
         throw new AppError(ErrorCode.CONFLICT, 'Cannot remove yourself', 400);
     }
 
-    // Find the member
     const member = await db.user.findUnique({ where: { id: memberId } });
 
     if (!member) {
@@ -129,7 +137,6 @@ export async function removeMember(orgId: string, removerId: string, memberId: s
         throw new ForbiddenError('Member is not part of your organization');
     }
 
-    // Check if this is the last admin
     if (member.role === UserRole.COMPANY_ADMIN) {
         const adminCount = await orgsRepo.countAdmins(orgId);
         if (adminCount <= 1) {
@@ -142,6 +149,71 @@ export async function removeMember(orgId: string, removerId: string, memberId: s
     }
 
     await orgsRepo.removeMember(memberId);
+}
+
+export async function listOrgJoinRequests(orgId: string, query: ListOrgJoinRequestsQuery) {
+    const org = await orgsRepo.findById(orgId);
+
+    if (!org) {
+        throw new NotFoundError('Organization');
+    }
+
+    return orgsRepo.listOrgJoinRequests(
+        orgId,
+        query.cursor,
+        query.limit,
+        query.status as OrgJoinRequestStatus | undefined
+    );
+}
+
+export async function reviewOrgJoinRequest(
+    orgId: string,
+    reviewerId: string,
+    requestId: string,
+    data: ReviewOrgJoinRequestInput
+) {
+    const joinRequest = await orgsRepo.findOrgJoinRequestById(requestId);
+
+    if (!joinRequest || joinRequest.orgId !== orgId) {
+        throw new NotFoundError('Organization join request');
+    }
+
+    if (joinRequest.status !== OrgJoinRequestStatus.PENDING) {
+        throw new AppError(ErrorCode.CONFLICT, 'Join request has already been reviewed', 409);
+    }
+
+    const reviewedStatus = data.action === 'APPROVE'
+        ? OrgJoinRequestStatus.APPROVED
+        : OrgJoinRequestStatus.REJECTED;
+
+    await db.$transaction(async (tx) => {
+        await tx.orgJoinRequest.update({
+            where: { id: requestId },
+            data: {
+                status: reviewedStatus,
+                reviewedBy: reviewerId,
+                reviewedAt: new Date(),
+                adminNote: data.adminNote,
+            },
+        });
+
+        await tx.user.update({
+            where: { id: joinRequest.userId },
+            data: {
+                status: reviewedStatus === OrgJoinRequestStatus.APPROVED
+                    ? UserStatus.ACTIVE
+                    : UserStatus.PENDING_ORG_APPROVAL,
+                role: reviewedStatus === OrgJoinRequestStatus.APPROVED
+                    ? UserRole.COMPANY_MEMBER
+                    : joinRequest.user.role,
+            },
+        });
+    });
+
+    return {
+        success: true,
+        status: reviewedStatus,
+    };
 }
 
 /**
@@ -161,11 +233,10 @@ export async function getOrgById(orgId: string) {
         throw new NotFoundError('Organization');
     }
 
-    if (org.status !== OrgStatus.ACTIVE) {
+    if (org.status !== OrgStatus.ACTIVE || org.verificationStatus !== OrgVerificationStatus.APPROVED) {
         throw new NotFoundError('Organization');
     }
 
-    // Return limited public fields
     return {
         id: org.id,
         name: org.name,

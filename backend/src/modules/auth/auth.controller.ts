@@ -8,14 +8,33 @@ import {
     setRefreshTokenCookie,
 } from '../../utils/cookies.js';
 import {
-    StudentSignupInput,
+    CompanyDocUploadInput,
     CompanySignupInput,
-    LoginInput,
-    VerifyOtpInput,
-    ResendOtpInput,
     ForgotPasswordInput,
+    LoginInput,
+    MfaRegenerateBackupCodesInput,
+    MfaSetupCompleteInput,
+    MfaSetupStartInput,
+    MfaVerifyInput,
+    ResendOtpInput,
     ResetPasswordInput,
+    StudentSignupInput,
+    VerifyOtpInput,
 } from './auth.validators.js';
+
+function getRequestMeta(req: Request<any, any, any, any>): { ip: string | null; userAgent: string | null } {
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const forwardedIp = Array.isArray(forwardedFor)
+        ? forwardedFor[0]
+        : typeof forwardedFor === 'string'
+            ? forwardedFor.split(',')[0]?.trim()
+            : null;
+
+    return {
+        ip: forwardedIp || req.ip || req.socket.remoteAddress || null,
+        userAgent: req.get('user-agent') || null,
+    };
+}
 
 /**
  * POST /auth/student/signup
@@ -37,6 +56,22 @@ export async function studentSignup(
 }
 
 /**
+ * POST /auth/company/signup/document-upload-url
+ */
+export async function companyDocumentUploadUrl(
+    req: Request<unknown, unknown, CompanyDocUploadInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await authService.getCompanyDocumentUploadUrl(req.body);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
  * POST /auth/company/signup
  */
 export async function companySignup(
@@ -50,6 +85,7 @@ export async function companySignup(
             message: 'Account created. Please check your email for verification code.',
             userId: result.userId,
             orgId: result.orgId,
+            nextStage: result.nextStage,
         });
     } catch (error) {
         next(error);
@@ -67,7 +103,7 @@ export async function verifyOtp(
     try {
         const result = await authService.verifySignupOtp(req.body.email, req.body.code);
         success(res, {
-            message: 'Email verified successfully. You can now log in.',
+            message: 'Email verified successfully. Continue to login.',
             ...result,
         });
     } catch (error) {
@@ -103,12 +139,181 @@ export async function login(
     next: NextFunction
 ): Promise<void> {
     try {
-        const tokens = await authService.login(req.body);
-        setRefreshTokenCookie(res, tokens.refreshToken);
+        const result = await authService.login(req.body);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /auth/mfa/setup/start
+ */
+export async function startMfaSetup(
+    req: Request<unknown, unknown, MfaSetupStartInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await authService.startMfaSetup(req.body.challengeToken);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /auth/mfa/setup/complete
+ */
+export async function completeMfaSetup(
+    req: Request<unknown, unknown, MfaSetupCompleteInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await authService.completeMfaSetup(
+            req.body.challengeToken,
+            req.body.code,
+            getRequestMeta(req)
+        );
+
+        setRefreshTokenCookie(res, result.tokens.refreshToken);
         success(res, {
-            accessToken: tokens.accessToken,
-            expiresIn: tokens.expiresIn,
+            accessToken: result.tokens.accessToken,
+            expiresIn: result.tokens.expiresIn,
+            backupCodes: result.backupCodes,
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /auth/mfa/verify
+ */
+export async function verifyMfa(
+    req: Request<unknown, unknown, MfaVerifyInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        const result = await authService.verifyMfaChallenge(
+            req.body.challengeToken,
+            {
+                code: req.body.code,
+                backupCode: req.body.backupCode,
+            },
+            getRequestMeta(req)
+        );
+
+        setRefreshTokenCookie(res, result.tokens.refreshToken);
+        success(res, {
+            accessToken: result.tokens.accessToken,
+            expiresIn: result.tokens.expiresIn,
+            usedBackupCode: result.usedBackupCode || false,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /auth/mfa/status
+ */
+export async function getMfaStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user) {
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+        }
+
+        const result = await authService.getMfaStatus(req.user.userId);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /auth/mfa/backup-codes/regenerate
+ */
+export async function regenerateBackupCodes(
+    req: Request<unknown, unknown, MfaRegenerateBackupCodesInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user) {
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+        }
+
+        const result = await authService.regenerateBackupCodes(req.user.userId, req.body.code);
+        success(res, result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /auth/sessions
+ */
+export async function getSessions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user) {
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+        }
+
+        const refreshToken = extractRefreshToken(req);
+        const sessions = await authService.listSessions(req.user.userId, refreshToken);
+        success(res, sessions);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * DELETE /auth/sessions/:id
+ */
+export async function revokeSession(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user) {
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+        }
+
+        await authService.revokeSession(req.user.userId, req.params.id);
+        success(res, { message: 'Session revoked' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * POST /auth/sessions/revoke-others
+ */
+export async function revokeOtherSessions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user) {
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+        }
+
+        const refreshToken = extractRefreshToken(req);
+        const result = await authService.revokeOtherSessions(req.user.userId, refreshToken);
+        success(res, result);
     } catch (error) {
         next(error);
     }
@@ -129,7 +334,7 @@ export async function refreshToken(
             throw new AppError(ErrorCode.TOKEN_INVALID, 'Refresh token is required', 401);
         }
 
-        const tokens = await authService.refreshAccessToken(refreshToken);
+        const tokens = await authService.refreshAccessToken(refreshToken, getRequestMeta(req));
         setRefreshTokenCookie(res, tokens.refreshToken);
         success(res, {
             accessToken: tokens.accessToken,
@@ -170,7 +375,6 @@ export async function forgotPassword(
 ): Promise<void> {
     try {
         await authService.requestPasswordReset(req.body.email);
-        // Always return success to prevent email enumeration
         success(res, {
             message: 'If an account exists with this email, you will receive a password reset code.',
         });
@@ -205,8 +409,9 @@ export async function getMe(
 ): Promise<void> {
     try {
         if (!req.user) {
-            throw new Error('User not authenticated');
+            throw new AppError(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
         }
+
         const user = await authService.getCurrentUser(req.user.userId);
         success(res, user);
     } catch (error) {

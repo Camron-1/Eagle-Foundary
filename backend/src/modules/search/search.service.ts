@@ -146,6 +146,7 @@ export async function search(
         const orgs = await db.org.findMany({
             where: {
                 status: OrgStatus.ACTIVE,
+                verificationStatus: 'APPROVED',
                 OR: [
                     { name: { contains: searchTerm, mode: 'insensitive' } },
                     { description: { contains: searchTerm, mode: 'insensitive' } },

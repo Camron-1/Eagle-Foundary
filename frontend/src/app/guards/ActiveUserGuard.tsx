@@ -14,6 +14,10 @@ export default function ActiveUserGuard(): JSX.Element {
     return <Navigate to="/verify-otp" replace />;
   }
 
+  if (user.status === 'PENDING_ORG_VERIFICATION' || user.status === 'PENDING_ORG_APPROVAL') {
+    return <Navigate to="/pending-approval" replace />;
+  }
+
   if (user.status === 'SUSPENDED') {
     return <Navigate to="/unauthorized" replace />;
   }

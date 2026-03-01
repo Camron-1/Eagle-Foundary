@@ -1,16 +1,24 @@
 import { db } from '../../connectors/db.js';
 
-/**
- * Get thread by ID with participants
- */
 export async function findThreadById(threadId: string) {
     return db.messageThread.findUnique({
         where: { id: threadId },
         include: {
+            participants: {
+                where: { removedAt: null },
+                select: { userId: true },
+            },
+            keyEnvelopes: {
+                orderBy: { createdAt: 'desc' },
+            },
             application: {
                 include: {
                     profile: { include: { user: { select: { id: true } } } },
-                    opportunity: { include: { org: { select: { id: true, members: { select: { id: true } } } } } },
+                    opportunity: {
+                        include: {
+                            org: { include: { members: { select: { id: true } } } },
+                        },
+                    },
                 },
             },
             joinRequest: {
@@ -18,7 +26,12 @@ export async function findThreadById(threadId: string) {
                     profile: { include: { user: { select: { id: true } } } },
                     startup: {
                         include: {
-                            members: { where: { role: 'founder' }, include: { profile: { select: { userId: true } } } },
+                            members: {
+                                where: { role: 'founder' },
+                                include: {
+                                    profile: { select: { userId: true } },
+                                },
+                            },
                         },
                     },
                 },
@@ -27,26 +40,32 @@ export async function findThreadById(threadId: string) {
     });
 }
 
-/**
- * Create message
- */
 export async function createMessage(data: {
     threadId: string;
     senderId: string;
-    content: string;
+    content?: string | null;
+    ciphertext?: string | null;
+    iv?: string | null;
+    keyVersion?: number | null;
+    encryptionVersion?: number | null;
+    isEncrypted: boolean;
+    senderKeyFingerprint?: string | null;
 }) {
     return db.message.create({
         data: {
             threadId: data.threadId,
             senderId: data.senderId,
             content: data.content,
+            ciphertext: data.ciphertext,
+            iv: data.iv,
+            keyVersion: data.keyVersion,
+            encryptionVersion: data.encryptionVersion,
+            isEncrypted: data.isEncrypted,
+            senderKeyFingerprint: data.senderKeyFingerprint,
         },
     });
 }
 
-/**
- * Get messages for a thread
- */
 export async function getMessages(
     threadId: string,
     cursor: string | undefined,
@@ -71,25 +90,18 @@ export async function getMessages(
     return { items: items.reverse(), nextCursor, hasMore };
 }
 
-/**
- * Get threads for a user (via applications or join requests)
- */
 export async function getThreadsForUser(userId: string, cursor: string | undefined, limit: number) {
-    // Get profile ID for students
     const profile = await db.studentProfile.findUnique({
         where: { userId },
         select: { id: true },
     });
 
-    // Get org ID for company users
     const user = await db.user.findUnique({
         where: { id: userId },
-        select: { orgId: true, role: true },
+        select: { orgId: true },
     });
 
     const take = limit + 1;
-
-    // Build where conditions
     const orConditions: object[] = [];
 
     if (profile) {
@@ -139,3 +151,4 @@ export async function getThreadsForUser(userId: string, cursor: string | undefin
 
     return { items, nextCursor, hasMore };
 }
+

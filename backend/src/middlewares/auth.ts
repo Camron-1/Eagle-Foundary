@@ -68,7 +68,12 @@ export async function requireActiveUser(
     try {
         const user = await db.user.findUnique({
             where: { id: req.user.userId },
-            select: { status: true },
+            select: {
+                status: true,
+                org: {
+                    select: { status: true },
+                },
+            },
         });
 
         if (!user) {
@@ -81,8 +86,23 @@ export async function requireActiveUser(
             return;
         }
 
+        if (user.status === UserStatus.PENDING_ORG_VERIFICATION) {
+            error(res, ErrorCode.ORG_VERIFICATION_PENDING, 'Organization verification is pending', 403);
+            return;
+        }
+
+        if (user.status === UserStatus.PENDING_ORG_APPROVAL) {
+            error(res, ErrorCode.ORG_APPROVAL_PENDING, 'Awaiting organization admin approval', 403);
+            return;
+        }
+
         if (user.status === UserStatus.SUSPENDED) {
             error(res, ErrorCode.ACCOUNT_SUSPENDED, 'Account has been suspended', 403);
+            return;
+        }
+
+        if (user.org?.status === 'SUSPENDED') {
+            error(res, ErrorCode.ORG_SUSPENDED, 'Organization has been suspended', 403);
             return;
         }
 

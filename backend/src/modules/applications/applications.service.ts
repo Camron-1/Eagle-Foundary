@@ -7,6 +7,43 @@ import { ErrorCode } from '../../utils/response.js';
 import { publish } from '../../events/publish.js';
 import { buildApplicationSubmittedEvent, buildApplicationStatusChangedEvent } from '../../events/builders.js';
 import { CreateApplicationInput, UpdateApplicationStatusInput, ListApplicationsQuery } from './applications.validators.js';
+import { decryptJsonValue, encryptJsonValue, type EncryptedEnvelope } from '../../utils/fieldEncryption.js';
+
+const SENSITIVE_FORM_ANSWER_KEYS = new Set([
+    'address',
+    'phone',
+    'dob',
+    'dateOfBirth',
+    'ssn',
+    'governmentId',
+    'taxId',
+    'passportNumber',
+    'licenseNumber',
+]);
+
+function splitSensitiveAnswers(
+    value: Record<string, unknown> | undefined
+): { publicAnswers?: Record<string, unknown>; sensitiveAnswers?: Record<string, unknown> } {
+    if (!value) {
+        return {};
+    }
+
+    const publicAnswers: Record<string, unknown> = {};
+    const sensitiveAnswers: Record<string, unknown> = {};
+
+    for (const [key, item] of Object.entries(value)) {
+        if (SENSITIVE_FORM_ANSWER_KEYS.has(key)) {
+            sensitiveAnswers[key] = item;
+        } else {
+            publicAnswers[key] = item;
+        }
+    }
+
+    return {
+        publicAnswers: Object.keys(publicAnswers).length > 0 ? publicAnswers : undefined,
+        sensitiveAnswers: Object.keys(sensitiveAnswers).length > 0 ? sensitiveAnswers : undefined,
+    };
+}
 
 /**
  * Create application (student only)
@@ -35,7 +72,7 @@ export async function createApplication(
         throw new AppError(ErrorCode.CONFLICT, 'Opportunity is not accepting applications', 400);
     }
 
-    if (opportunity.org.status !== OrgStatus.ACTIVE) {
+    if (opportunity.org.status !== OrgStatus.ACTIVE || opportunity.org.verificationStatus !== 'APPROVED') {
         throw new AppError(ErrorCode.CONFLICT, 'Organization is not active', 400);
     }
 
@@ -48,12 +85,21 @@ export async function createApplication(
     let coverLetter = data.coverLetter;
     let resumeUrl = data.resumeUrl;
     let sanitizedFormAnswers: Record<string, unknown> | undefined;
+    let sensitivePayloadEncrypted: Record<string, unknown> | undefined;
 
     if (data.formAnswers && typeof data.formAnswers === 'object') {
         const { coverLetter: faCover, resumeUrl: faResume, ...rest } = data.formAnswers;
         if (!coverLetter && faCover) coverLetter = faCover;
         if (!resumeUrl && faResume) resumeUrl = faResume;
-        sanitizedFormAnswers = rest;
+        const split = splitSensitiveAnswers(rest);
+        sanitizedFormAnswers = split.publicAnswers;
+        if (split.sensitiveAnswers) {
+            sensitivePayloadEncrypted = await encryptJsonValue(
+                split.sensitiveAnswers,
+                'application_form_answers',
+                `${opportunityId}:${profile.id}`
+            ) as unknown as Record<string, unknown>;
+        }
     }
 
     const application = await applicationsRepo.createApplication({
@@ -62,6 +108,7 @@ export async function createApplication(
         coverLetter,
         resumeUrl,
         formAnswers: sanitizedFormAnswers,
+        sensitivePayloadEncrypted,
     });
 
     // Publish event
@@ -177,6 +224,28 @@ export async function getApplicationById(orgId: string, applicationId: string) {
 
     if (application.opportunity.orgId !== orgId) {
         throw new ForbiddenError('Access denied');
+    }
+
+    if (application.sensitivePayloadEncrypted && typeof application.sensitivePayloadEncrypted === 'object') {
+        try {
+            const sensitiveAnswers = await decryptJsonValue<Record<string, unknown>>(
+                application.sensitivePayloadEncrypted as unknown as EncryptedEnvelope,
+                'application_form_answers',
+                `${application.opportunityId}:${application.profileId}`
+            );
+            const mergedFormAnswers = {
+                ...(typeof application.formAnswers === 'object' && application.formAnswers
+                    ? application.formAnswers as Record<string, unknown>
+                    : {}),
+                ...sensitiveAnswers,
+            };
+            return {
+                ...application,
+                formAnswers: mergedFormAnswers,
+            };
+        } catch {
+            // Keep endpoint resilient during mixed-data rollout.
+        }
     }
 
     return application;

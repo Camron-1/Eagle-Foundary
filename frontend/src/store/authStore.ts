@@ -1,14 +1,33 @@
 import { create } from 'zustand';
 import { api, setAccessToken, unwrapApiData } from '@/lib/api/client';
 import { endpoints } from '@/lib/api/endpoints';
-import type { User, UserRole, LoginPayload } from '@/lib/api/types';
+import type {
+  LoginPayload,
+  LoginResponse,
+  LoginNextStep,
+  MfaSetupCompletePayload,
+  MfaSetupCompleteResponse,
+  MfaVerifyPayload,
+  MfaVerifyResponse,
+  User,
+  UserRole,
+} from '@/lib/api/types';
+
+interface PendingMfaChallenge {
+  nextStep: LoginNextStep;
+  challengeToken: string;
+}
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  pendingMfaChallenge: PendingMfaChallenge | null;
 
-  login: (payload: LoginPayload) => Promise<void>;
+  login: (payload: LoginPayload) => Promise<LoginResponse>;
+  completeMfaSetup: (payload: MfaSetupCompletePayload) => Promise<MfaSetupCompleteResponse>;
+  verifyMfa: (payload: MfaVerifyPayload) => Promise<MfaVerifyResponse>;
+  clearPendingMfaChallenge: () => void;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
   silentRefresh: () => Promise<void>;
@@ -16,26 +35,74 @@ interface AuthState {
   reset: () => void;
 }
 
+function isMfaLoginResponse(value: LoginResponse): value is Required<Pick<LoginResponse, 'nextStep' | 'challengeToken'>> {
+  return typeof value.nextStep === 'string' && typeof value.challengeToken === 'string';
+}
+
+function isTokenLoginResponse(value: LoginResponse): value is Required<Pick<LoginResponse, 'accessToken'>> {
+  return typeof value.accessToken === 'string' && value.accessToken.length > 0;
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
+  pendingMfaChallenge: null,
 
   login: async (payload) => {
     const { data } = await api.post(endpoints.auth.login, payload);
-    const auth = unwrapApiData<{ accessToken: string }>(data);
-    setAccessToken(auth.accessToken);
-    await get().fetchMe();
+    const result = unwrapApiData<LoginResponse>(data);
+
+    if (isMfaLoginResponse(result)) {
+      set({
+        pendingMfaChallenge: {
+          nextStep: result.nextStep,
+          challengeToken: result.challengeToken,
+        },
+      });
+      return result;
+    }
+
+    if (isTokenLoginResponse(result)) {
+      setAccessToken(result.accessToken);
+      set({ pendingMfaChallenge: null });
+      await get().fetchMe();
+      return result;
+    }
+
+    throw new Error('Unexpected login response');
   },
+
+  completeMfaSetup: async (payload) => {
+    const { data } = await api.post(endpoints.auth.mfaSetupComplete, payload);
+    const result = unwrapApiData<MfaSetupCompleteResponse>(data);
+
+    setAccessToken(result.accessToken);
+    set({ pendingMfaChallenge: null });
+    await get().fetchMe();
+    return result;
+  },
+
+  verifyMfa: async (payload) => {
+    const { data } = await api.post(endpoints.auth.mfaVerify, payload);
+    const result = unwrapApiData<MfaVerifyResponse>(data);
+
+    setAccessToken(result.accessToken);
+    set({ pendingMfaChallenge: null });
+    await get().fetchMe();
+    return result;
+  },
+
+  clearPendingMfaChallenge: () => set({ pendingMfaChallenge: null }),
 
   logout: async () => {
     try {
       await api.post(endpoints.auth.logout, {});
     } catch {
-      /* swallow — we clear state regardless */
+      /* swallow - we clear state regardless */
     }
     setAccessToken(null);
-    set({ user: null, isAuthenticated: false, isLoading: false });
+    set({ user: null, isAuthenticated: false, isLoading: false, pendingMfaChallenge: null });
   },
 
   fetchMe: async () => {
@@ -63,7 +130,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   reset: () => {
     setAccessToken(null);
-    set({ user: null, isAuthenticated: false, isLoading: false });
+    set({ user: null, isAuthenticated: false, isLoading: false, pendingMfaChallenge: null });
   },
 }));
 

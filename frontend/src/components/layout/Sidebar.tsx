@@ -54,6 +54,7 @@ const sharedNav: NavItem[] = [
   { label: 'Messages', to: '/messages', icon: MessageSquare },
   { label: 'Notifications', to: '/notifications', icon: Bell },
   { label: 'Search', to: '/search', icon: Search },
+  { label: 'Security', to: '/settings/security', icon: Shield },
 ];
 
 const discoveryNav: NavItem[] = [
@@ -117,7 +118,7 @@ export function Sidebar({ collapsed }: SidebarProps): JSX.Element {
               }`
             }
           >
-            <Shield size={16} />
+            <Flag size={16} />
             My Reports
           </NavLink>
         </div>

@@ -26,7 +26,7 @@ if (process.env.NODE_ENV !== 'production') {
 if (process.env.NODE_ENV === 'development') {
     db.$on('query' as never, (e: { query: string; duration: number }) => {
         if (e.duration > 100) {
-            logger.warn({ query: e.query, duration: e.duration }, 'Slow query detected');
+            logger.warn({ duration: e.duration }, 'Slow query detected');
         }
     });
 }

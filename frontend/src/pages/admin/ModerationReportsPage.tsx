@@ -170,6 +170,17 @@ export default function ModerationReportsPage(): JSX.Element {
               Target: {selectedReport.targetType} — {truncate(selectedReport.targetId, 20)}
             </p>
             <p className="text-sm text-zinc-300">{selectedReport.reporterReason}</p>
+            {selectedReport.evidenceText && (
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="mb-1 text-xs uppercase tracking-[0.12em] text-zinc-500">Reporter Evidence</p>
+                <p className="text-sm text-zinc-300">{selectedReport.evidenceText}</p>
+              </div>
+            )}
+            {selectedReport.evidenceMessageId && (
+              <p className="font-mono text-xs text-zinc-500">
+                Evidence message: {selectedReport.evidenceMessageId}
+              </p>
+            )}
             <Select
               label="Resolution"
               options={[

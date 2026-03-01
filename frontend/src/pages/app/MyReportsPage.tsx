@@ -16,25 +16,28 @@ import { toast } from '@/components/ui/toast';
 import { format } from 'date-fns';
 
 const TARGET_TYPE_OPTIONS = [
-  { value: 'startup', label: 'Startup' },
-  { value: 'opportunity', label: 'Opportunity' },
-  { value: 'user', label: 'User' },
-  { value: 'message', label: 'Message' },
+  { value: 'STARTUP', label: 'Startup' },
+  { value: 'OPPORTUNITY', label: 'Opportunity' },
+  { value: 'USER', label: 'User' },
+  { value: 'MESSAGE', label: 'Message' },
+  { value: 'ORG', label: 'Organization' },
 ];
 
 export default function MyReportsPage(): JSX.Element {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [targetType, setTargetType] = useState<string>('startup');
+  const [targetType, setTargetType] = useState<string>('STARTUP');
   const [targetId, setTargetId] = useState('');
   const [reporterReason, setReporterReason] = useState('');
+  const [evidenceText, setEvidenceText] = useState('');
+  const [evidenceMessageId, setEvidenceMessageId] = useState('');
 
-  const { data: reports = [], isLoading } = useQuery({
+  const { data: reports = [], isLoading } = useQuery<Report[]>({
     queryKey: ['reports', 'me'],
     queryFn: async () => {
       const res = await api.get<{ data?: Report[] } | Report[]>(endpoints.reports.me);
       const body = res.data;
-      return (body && typeof body === 'object' && 'data' in body ? body.data : body) ?? [];
+      return ((body && typeof body === 'object' && 'data' in body ? body.data : body) ?? []) as Report[];
     },
   });
 
@@ -45,9 +48,11 @@ export default function MyReportsPage(): JSX.Element {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports', 'me'] });
       setModalOpen(false);
-      setTargetType('startup');
+      setTargetType('STARTUP');
       setTargetId('');
       setReporterReason('');
+      setEvidenceText('');
+      setEvidenceMessageId('');
       toast.success('Report submitted successfully');
     },
     onError: (err: Error) => {
@@ -66,6 +71,8 @@ export default function MyReportsPage(): JSX.Element {
       targetType: targetType as CreateReportPayload['targetType'],
       targetId: trimmedId,
       reporterReason: trimmedReason,
+      evidenceText: evidenceText.trim() ? evidenceText.trim() : null,
+      evidenceMessageId: evidenceMessageId.trim() ? evidenceMessageId.trim() : null,
     });
   };
 
@@ -103,7 +110,7 @@ export default function MyReportsPage(): JSX.Element {
     },
   ];
 
-  const tableData = reports.map((r) => ({ ...r } as Report & Record<string, unknown>));
+  const tableData = reports.map((r: Report) => ({ ...r } as Report & Record<string, unknown>));
 
   return (
     <div className="space-y-8">
@@ -140,6 +147,19 @@ export default function MyReportsPage(): JSX.Element {
             value={reporterReason}
             onChange={(e) => setReporterReason(e.target.value)}
             rows={4}
+          />
+          <Textarea
+            label="Evidence (optional)"
+            placeholder="Paste relevant excerpt or context for moderation review"
+            value={evidenceText}
+            onChange={(e) => setEvidenceText(e.target.value)}
+            rows={3}
+          />
+          <Input
+            label="Evidence message ID (optional)"
+            placeholder="Message UUID, if applicable"
+            value={evidenceMessageId}
+            onChange={(e) => setEvidenceMessageId(e.target.value)}
           />
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="ghost" onClick={() => setModalOpen(false)}>

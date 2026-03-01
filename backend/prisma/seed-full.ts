@@ -19,6 +19,7 @@ import {
     UserRole,
     UserStatus,
     OrgStatus,
+    OrgVerificationStatus,
     StartupStatus,
     OpportunityStatus,
     ApplicationStatus,
@@ -206,6 +207,8 @@ async function main() {
         website: 'https://technova.io',
         status: OrgStatus.ACTIVE,
         isVerifiedBadge: true,
+        verificationStatus: OrgVerificationStatus.APPROVED,
+        verifiedDomains: ['technova.io'],
     });
     const techNovaAdmin = await upsertUser('ceo@technova.io', UserRole.COMPANY_ADMIN, techNova.id);
     const techNovaMember = await upsertUser('hr@technova.io', UserRole.COMPANY_MEMBER, techNova.id);
@@ -219,6 +222,8 @@ async function main() {
         website: 'https://greenbridge.co',
         status: OrgStatus.ACTIVE,
         isVerifiedBadge: false,
+        verificationStatus: OrgVerificationStatus.APPROVED,
+        verifiedDomains: ['greenbridge.co'],
     });
     const greenBridgeAdmin = await upsertUser('founder@greenbridge.co', UserRole.COMPANY_ADMIN, greenBridge.id);
     console.log(`🏢 Org:     GreenBridge Ventures`);
@@ -230,6 +235,8 @@ async function main() {
         website: 'https://designcraft.studio',
         status: OrgStatus.ACTIVE,
         isVerifiedBadge: true,
+        verificationStatus: OrgVerificationStatus.APPROVED,
+        verifiedDomains: ['designcraft.studio'],
     });
     const designCraftAdmin = await upsertUser('lead@designcraft.studio', UserRole.COMPANY_ADMIN, designCraft.id);
     console.log(`🏢 Org:     DesignCraft Studio (verified)`);

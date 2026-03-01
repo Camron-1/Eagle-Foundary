@@ -1,15 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import { endpoints } from '@/lib/api/endpoints';
-import type { MessageThread, Message } from '@/lib/api/types';
+import type { MessageThread, Message, ThreadCryptoContext } from '@/lib/api/types';
 import { useAuth } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/cn';
+import { ensureDeviceKeyMaterial } from '@/lib/security/keyStore';
+import { decryptThreadMessage, encryptThreadMessage } from '@/lib/security/e2ee';
+import { toast } from '@/components/ui/toast';
 
 function getThreadContext(thread: MessageThread): string {
   if (thread.application) return `Application: ${thread.application.opportunity?.title ?? 'Opportunity'}`;
@@ -25,12 +28,27 @@ export default function ThreadPage(): JSX.Element {
   const currentUserId = user?.id ?? null;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState('');
+  const [decryptedMap, setDecryptedMap] = useState<Record<string, string>>({});
+  const [myFingerprint, setMyFingerprint] = useState<string | null>(null);
 
   const { data: thread, isLoading: threadLoading } = useQuery({
     queryKey: ['messages', 'thread', threadId],
     queryFn: async () => {
-      const res = await api.get<MessageThread>(endpoints.messages.thread(threadId!));
-      return res.data;
+      const res = await api.get<{ data?: MessageThread } | MessageThread>(endpoints.messages.thread(threadId!));
+      const payload = res.data;
+      return (payload && typeof payload === 'object' && 'data' in payload ? payload.data : payload) as MessageThread;
+    },
+    enabled: !!threadId,
+  });
+
+  const { data: cryptoContext } = useQuery({
+    queryKey: ['messages', 'thread', threadId, 'crypto-context'],
+    queryFn: async () => {
+      const res = await api.get<{ data?: ThreadCryptoContext } | ThreadCryptoContext>(
+        endpoints.messages.threadCryptoContext(threadId!)
+      );
+      const payload = res.data;
+      return (payload && typeof payload === 'object' && 'data' in payload ? payload.data : payload) as ThreadCryptoContext;
     },
     enabled: !!threadId,
   });
@@ -39,7 +57,7 @@ export default function ThreadPage(): JSX.Element {
     queryKey: ['messages', 'thread', threadId, 'messages'],
     queryFn: async () => {
       const res = await api.get<{ data?: Message[] } | Message[]>(
-        endpoints.messages.threadMessages(threadId!),
+        endpoints.messages.threadMessages(threadId!)
       );
       const body = res.data;
       const list = (body && typeof body === 'object' && 'data' in body ? body.data : body) ?? [];
@@ -49,34 +67,105 @@ export default function ThreadPage(): JSX.Element {
     refetchInterval: 10_000,
   });
 
+  useEffect(() => {
+    if (!user) return;
+
+    let mounted = true;
+    ensureDeviceKeyMaterial()
+      .then(async (material) => {
+        if (!mounted) return;
+        setMyFingerprint(material.fingerprint);
+        try {
+          await api.get(endpoints.messages.myKey);
+        } catch {
+          await api.post(endpoints.messages.registerKey, {
+            publicKeyPem: material.publicKeyPem,
+            fingerprint: material.fingerprint,
+            algorithm: material.algorithm,
+          });
+        }
+      })
+      .catch(() => {
+        if (!mounted) return;
+        toast.error('Unable to initialize secure messaging on this device.');
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
+
+  const messages = messagesData ?? [];
+
+  useEffect(() => {
+    if (!cryptoContext || !currentUserId || messages.length === 0) {
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const entries = await Promise.all(
+        messages.map(async (msg) => {
+          const value = await decryptThreadMessage(msg, cryptoContext, currentUserId);
+          return [msg.id, value] as const;
+        })
+      );
+      if (!cancelled) {
+        setDecryptedMap(Object.fromEntries(entries));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages, cryptoContext, currentUserId]);
+
   const sendMutation = useMutation({
-    mutationFn: async (payload: { content: string }) => {
-      await api.post(endpoints.messages.sendMessage(threadId!), payload);
+    mutationFn: async () => {
+      const trimmed = content.trim();
+      if (!trimmed) return;
+
+      if (!threadId) {
+        throw new Error('Missing thread');
+      }
+
+      if (cryptoContext?.encryptionRequired && !cryptoContext?.isLegacyPlaintextThread) {
+        if (!currentUserId || !myFingerprint) {
+          throw new Error('Secure messaging keys are not ready yet');
+        }
+
+        const encrypted = await encryptThreadMessage(trimmed, cryptoContext, currentUserId, myFingerprint);
+        await api.post(endpoints.messages.sendMessage(threadId), encrypted);
+      } else {
+        await api.post(endpoints.messages.sendMessage(threadId), { content: trimmed });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', 'thread', threadId, 'messages'] });
       queryClient.invalidateQueries({ queryKey: ['messages', 'threads'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', 'thread', threadId, 'crypto-context'] });
       setContent('');
     },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to send message');
+    },
   });
-
-  const messages = messagesData ?? [];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
-  const handleSend = () => {
-    const trimmed = content.trim();
-    if (!trimmed || sendMutation.isPending) return;
-    sendMutation.mutate({ content: trimmed });
-  };
-
   useEffect(() => {
     if (!threadId) navigate('/messages');
   }, [threadId, navigate]);
 
-  if (!threadId) return null;
+  const encryptionBadge = useMemo(() => {
+    if (!cryptoContext) return null;
+    if (cryptoContext.isLegacyPlaintextThread) return 'Legacy thread';
+    return cryptoContext.encryptionRequired ? 'End-to-end encrypted' : 'Standard thread';
+  }, [cryptoContext]);
+
+  if (!threadId) return <></>;
 
   if (threadLoading || !thread) {
     return (
@@ -96,9 +185,12 @@ export default function ThreadPage(): JSX.Element {
         >
           ← Back
         </button>
-        <h1 className="ef-heading-gradient text-2xl font-semibold leading-tight md:text-3xl">
-          {getThreadContext(thread)}
-        </h1>
+        <div className="space-y-1">
+          <h1 className="ef-heading-gradient text-2xl font-semibold leading-tight md:text-3xl">
+            {getThreadContext(thread)}
+          </h1>
+          {encryptionBadge && <p className="text-xs uppercase tracking-[0.12em] text-zinc-500">{encryptionBadge}</p>}
+        </div>
       </header>
 
       <div className="flex flex-1 flex-col rounded-2xl border border-white/10 bg-black/45">
@@ -112,6 +204,7 @@ export default function ThreadPage(): JSX.Element {
           ) : (
             messages.map((msg) => {
               const isOwn = msg.senderId === currentUserId;
+              const renderedText = decryptedMap[msg.id] ?? (msg.content ?? '...');
               return (
                 <div
                   key={msg.id}
@@ -136,7 +229,7 @@ export default function ThreadPage(): JSX.Element {
                           : 'bg-white/5 text-zinc-200',
                       )}
                     >
-                      <p className="text-sm">{msg.content}</p>
+                      <p className="text-sm">{renderedText}</p>
                       <p className="mt-1 text-xs text-zinc-500">
                         {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
                       </p>
@@ -159,14 +252,14 @@ export default function ThreadPage(): JSX.Element {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSend();
+                  sendMutation.mutate();
                 }
               }}
             />
             <Button
               variant="primary"
               withBorderEffect={false}
-              onClick={handleSend}
+              onClick={() => sendMutation.mutate()}
               disabled={!content.trim() || sendMutation.isPending}
               className="self-end"
             >

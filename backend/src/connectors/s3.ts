@@ -44,6 +44,12 @@ export async function generatePresignedUploadUrl(
         Key: key,
         ContentType: contentType,
         ContentLength: contentLength,
+        ...(env.AWS_KMS_KEY_ID
+            ? {
+                ServerSideEncryption: 'aws:kms',
+                SSEKMSKeyId: env.AWS_KMS_KEY_ID,
+            }
+            : {}),
     });
 
     const uploadUrl = await getSignedUrl(s3Client, command, {

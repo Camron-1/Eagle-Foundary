@@ -14,6 +14,9 @@ export default function GuestGuard(): JSX.Element {
   if (isLoading) return <div className="flex h-screen items-center justify-center bg-black" />;
 
   if (isAuthenticated && user) {
+    if (user.status === 'PENDING_ORG_VERIFICATION' || user.status === 'PENDING_ORG_APPROVAL') {
+      return <Navigate to="/pending-approval" replace />;
+    }
     const dest = dashboardByRole[user.role] ?? '/dashboard';
     return <Navigate to={dest} replace />;
   }

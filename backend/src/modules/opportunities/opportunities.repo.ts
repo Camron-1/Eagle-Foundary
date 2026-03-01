@@ -37,7 +37,7 @@ export async function findById(id: string) {
     return db.opportunity.findUnique({
         where: { id },
         include: {
-            org: { select: { id: true, name: true, logoUrl: true, isVerifiedBadge: true, status: true } },
+            org: { select: { id: true, name: true, logoUrl: true, isVerifiedBadge: true, status: true, verificationStatus: true } },
         },
     });
 }
@@ -84,7 +84,7 @@ export async function listPublishedOpportunities(
 
     const where: Prisma.OpportunityWhereInput = {
         status: 'PUBLISHED',
-        org: { status: 'ACTIVE' },
+        org: { status: 'ACTIVE', verificationStatus: 'APPROVED' },
         ...(filters.budgetType && { budgetType: filters.budgetType }),
         ...(filters.tags?.length && { tags: { hasSome: filters.tags } }),
         ...(filters.search && {

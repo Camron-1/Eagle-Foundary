@@ -1,3 +1,4 @@
+import { OrgJoinRequestStatus } from '@prisma/client';
 import { db } from '../../connectors/db.js';
 
 export interface OrgData {
@@ -8,6 +9,11 @@ export interface OrgData {
     logoUrl: string | null;
     status: string;
     isVerifiedBadge: boolean;
+    verificationStatus: string;
+    verificationSubmittedAt: Date | null;
+    verificationReviewedAt: Date | null;
+    verificationReviewNotes: string | null;
+    verifiedDomains: string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -70,6 +76,7 @@ export async function listActiveOrgs(
 
     const where = {
         status: 'ACTIVE' as const,
+        verificationStatus: 'APPROVED' as const,
         ...(search && {
             name: { contains: search, mode: 'insensitive' as const },
         }),
@@ -154,5 +161,70 @@ export async function countMembers(orgId: string): Promise<number> {
 export async function countAdmins(orgId: string): Promise<number> {
     return db.user.count({
         where: { orgId, role: 'COMPANY_ADMIN' },
+    });
+}
+
+export async function listOrgJoinRequests(
+    orgId: string,
+    cursor: string | undefined,
+    limit: number,
+    status?: OrgJoinRequestStatus
+) {
+    const take = limit + 1;
+
+    const items = await db.orgJoinRequest.findMany({
+        where: {
+            orgId,
+            ...(status ? { status } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+        take,
+        ...(cursor
+            ? {
+                cursor: { id: cursor },
+                skip: 1,
+            }
+            : {}),
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    email: true,
+                    status: true,
+                    createdAt: true,
+                },
+            },
+        },
+    });
+
+    const hasMore = items.length > limit;
+    const sliced = hasMore ? items.slice(0, limit) : items;
+    const nextCursor = hasMore && sliced.length > 0 ? sliced[sliced.length - 1].id : null;
+
+    return { items: sliced, nextCursor, hasMore };
+}
+
+export async function findOrgJoinRequestById(id: string) {
+    return db.orgJoinRequest.findUnique({
+        where: { id },
+        include: {
+            user: true,
+            org: true,
+        },
+    });
+}
+
+export async function reviewOrgJoinRequest(
+    id: string,
+    data: {
+        status: OrgJoinRequestStatus;
+        reviewedBy: string;
+        reviewedAt: Date;
+        adminNote?: string | null;
+    }
+) {
+    return db.orgJoinRequest.update({
+        where: { id },
+        data,
     });
 }

@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import * as orgsService from './orgs.service.js';
-import { success, created, noContent, paginated } from '../../utils/response.js';
-import { UpdateOrgInput, AddMemberInput } from './orgs.validators.js';
+import { created, noContent, paginated, success } from '../../utils/response.js';
+import {
+    AddMemberInput,
+    ListOrgJoinRequestsQuery,
+    ReviewOrgJoinRequestInput,
+    UpdateOrgInput,
+} from './orgs.validators.js';
 import { AppError } from '../../middlewares/errorHandler.js';
 import { ErrorCode } from '../../utils/response.js';
 import { parseLimit } from '../../utils/pagination.js';
@@ -96,6 +101,61 @@ export async function removeMember(
         }
         await orgsService.removeMember(req.user.orgId, req.user.userId, req.params.memberId);
         noContent(res);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * GET /orgs/me/join-requests
+ */
+export async function listOrgJoinRequests(
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user?.orgId) {
+            throw new AppError(ErrorCode.NOT_FOUND, 'Not part of an organization', 404);
+        }
+
+        const query: ListOrgJoinRequestsQuery = {
+            cursor: req.query.cursor as string | undefined,
+            limit: parseLimit(req.query.limit),
+            status: req.query.status as ListOrgJoinRequestsQuery['status'],
+        };
+
+        const result = await orgsService.listOrgJoinRequests(req.user.orgId, query);
+        paginated(res, result.items, {
+            nextCursor: result.nextCursor,
+            hasMore: result.hasMore,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * PATCH /orgs/me/join-requests/:id
+ */
+export async function reviewOrgJoinRequest(
+    req: Request<{ id: string }, unknown, ReviewOrgJoinRequestInput>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user?.orgId) {
+            throw new AppError(ErrorCode.NOT_FOUND, 'Not part of an organization', 404);
+        }
+
+        const result = await orgsService.reviewOrgJoinRequest(
+            req.user.orgId,
+            req.user.userId,
+            req.params.id,
+            req.body
+        );
+
+        success(res, result);
     } catch (error) {
         next(error);
     }

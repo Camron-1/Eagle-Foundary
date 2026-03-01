@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import * as adminController from './admin.controller.js';
-import { validateBody, validateParams, uuidParamSchema } from '../../middlewares/validate.js';
+import { validateBody, validateParams, validateQuery, uuidParamSchema } from '../../middlewares/validate.js';
 import { authMiddleware, requireActiveUser } from '../../middlewares/auth.js';
 import { requireUniversityAdmin } from '../../middlewares/rbac.js';
 import {
+    listOrgVerificationsQuerySchema,
+    reviewOrgVerificationSchema,
     reviewStartupSchema,
-    updateUserStatusSchema,
     updateOrgStatusSchema,
+    updateUserStatusSchema,
 } from './admin.validators.js';
 
 const router = Router();
@@ -39,6 +41,12 @@ router.patch(
     adminController.updateUserStatus
 );
 
+router.post(
+    '/users/:id/mfa/reset',
+    validateParams(uuidParamSchema),
+    adminController.resetUserMfa
+);
+
 // Org management
 router.get('/orgs', adminController.listOrgs);
 
@@ -47,6 +55,25 @@ router.patch(
     validateParams(uuidParamSchema),
     validateBody(updateOrgStatusSchema),
     adminController.updateOrgStatus
+);
+
+router.get(
+    '/orgs/verifications',
+    validateQuery(listOrgVerificationsQuerySchema),
+    adminController.listOrgVerifications
+);
+
+router.get(
+    '/orgs/:id/verification-docs',
+    validateParams(uuidParamSchema),
+    adminController.getOrgVerificationDocuments
+);
+
+router.patch(
+    '/orgs/:id/verification',
+    validateParams(uuidParamSchema),
+    validateBody(reviewOrgVerificationSchema),
+    adminController.reviewOrgVerification
 );
 
 // Audit logs

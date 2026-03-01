@@ -37,7 +37,19 @@ export default function LoginPage(): JSX.Element {
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
-      await login(values);
+      const result = await login(values);
+      if (result.nextStep && result.challengeToken) {
+        const route = result.nextStep === 'MFA_SETUP' ? '/mfa/setup' : '/mfa/challenge';
+        navigate(route, {
+          replace: true,
+          state: {
+            challengeToken: result.challengeToken,
+            from,
+          },
+        });
+        return;
+      }
+
       const user = useAuthStore.getState().user;
       const dest = from ?? dashboardByRole[user?.role ?? ''] ?? '/dashboard';
       navigate(dest, { replace: true });

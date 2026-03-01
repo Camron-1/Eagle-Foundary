@@ -17,6 +17,9 @@ const StudentSignupPage = lazy(() => import('@/pages/auth/StudentSignupPage'));
 const CompanySignupPage = lazy(() => import('@/pages/auth/CompanySignupPage'));
 const VerifyOtpPage = lazy(() => import('@/pages/auth/VerifyOtpPage'));
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
+const MfaSetupPage = lazy(() => import('@/pages/auth/MfaSetupPage'));
+const MfaChallengePage = lazy(() => import('@/pages/auth/MfaChallengePage'));
+const PendingApprovalPage = lazy(() => import('@/pages/auth/PendingApprovalPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'));
 
@@ -59,6 +62,7 @@ const ThreadPage = lazy(() => import('@/pages/app/ThreadPage'));
 const NotificationsPage = lazy(() => import('@/pages/app/NotificationsPage'));
 const SearchPage = lazy(() => import('@/pages/app/SearchPage'));
 const MyReportsPage = lazy(() => import('@/pages/app/MyReportsPage'));
+const SecurityPage = lazy(() => import('@/pages/app/SecurityPage'));
 
 const NotFoundPage = lazy(() => import('@/pages/system/NotFoundPage'));
 const UnauthorizedPage = lazy(() => import('@/pages/system/UnauthorizedPage'));
@@ -101,6 +105,8 @@ export const router = createBrowserRouter([
               { path: '/sign-up/company', element: <CompanySignupPage /> },
               { path: '/verify-otp', element: <VerifyOtpPage /> },
               { path: '/login', element: <LoginPage /> },
+              { path: '/mfa/setup', element: <MfaSetupPage /> },
+              { path: '/mfa/challenge', element: <MfaChallengePage /> },
               { path: '/forgot-password', element: <ForgotPasswordPage /> },
               { path: '/reset-password', element: <ResetPasswordPage /> },
             ],
@@ -112,6 +118,7 @@ export const router = createBrowserRouter([
       {
         element: <AuthGuard />,
         children: [
+          { path: '/pending-approval', element: <PendingApprovalPage /> },
           {
             element: <ActiveUserGuard />,
             children: [
@@ -193,6 +200,7 @@ export const router = createBrowserRouter([
                   { path: '/messages/:threadId', element: <ThreadPage /> },
                   { path: '/notifications', element: <NotificationsPage /> },
                   { path: '/search', element: <SearchPage /> },
+                  { path: '/settings/security', element: <SecurityPage /> },
                   { path: '/reports', element: <MyReportsPage /> },
                 ],
               },

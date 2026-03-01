@@ -1,6 +1,8 @@
 // User status
 export const UserStatus = {
     PENDING_OTP: 'PENDING_OTP',
+    PENDING_ORG_VERIFICATION: 'PENDING_ORG_VERIFICATION',
+    PENDING_ORG_APPROVAL: 'PENDING_ORG_APPROVAL',
     ACTIVE: 'ACTIVE',
     SUSPENDED: 'SUSPENDED',
 } as const;
@@ -116,6 +118,7 @@ export const FileContextType = {
     PORTFOLIO: 'portfolio',
     OPPORTUNITY: 'opportunity',
     ORG_LOGO: 'org_logo',
+    ORG_VERIFICATION_DOCUMENT: 'org_verification_document',
     APPLICATION: 'application',
     MESSAGE: 'message',
 } as const;
@@ -179,6 +182,17 @@ export const NotificationType = {
     APPLICATION_RECEIVED: 'application_received',
     APPLICATION_STATUS_CHANGED: 'application_status_changed',
     NEW_MESSAGE: 'new_message',
+    SECURITY_NEW_LOGIN: 'security_new_login',
+    SECURITY_MFA_ENABLED: 'security_mfa_enabled',
+    SECURITY_MFA_RESET: 'security_mfa_reset',
+    ORG_VERIFICATION_APPROVED: 'org_verification_approved',
+    ORG_VERIFICATION_REJECTED: 'org_verification_rejected',
 } as const;
 
 export type NotificationTypeType = (typeof NotificationType)[keyof typeof NotificationType];
+
+export const EncryptionConstants = {
+    DEFAULT_KEY_VERSION: 1,
+    DEFAULT_ENCRYPTION_VERSION: 1,
+    MESSAGE_PREVIEW_REDACTED: 'New encrypted message',
+} as const;

@@ -85,6 +85,27 @@ Health: `http://localhost:3000/health`
 
 ---
 
+## Test users
+
+If you have run `npx tsx prisma/seed-full.ts` (recommended for full manual testing), you can use the following accounts. **All passwords are `Test1234!`**.
+
+| Role | Email | Details |
+| :--- | :--- | :--- |
+| **University Admin** | `admin@ashland.edu` | Global management & review access |
+| **Student (Founder)** | `c` | Founder of *CampusEats* |
+| **Student** | `bob@ashland.edu` | Member of *CampusEats* |
+| **Student (Founder)** | `carol@ashland.edu` | Founder of *DataLens*; applied to *TechNova* |
+| **Student (Founder)** | `dave@ashland.edu` | Founder of *ArtBoard*; selected by *DesignCraft* |
+| **Student (Founder)** | `emma@ashland.edu` | Founder of *SecureVault* |
+| **Company Admin** | `ceo@technova.io` | Admin for *TechNova Solutions* |
+| **Company Member** | `hr@technova.io` | Member for *TechNova Solutions* |
+| **Company Admin** | `founder@greenbridge.co` | Admin for *GreenBridge Ventures* |
+| **Company Admin** | `lead@designcraft.studio` | Admin for *DesignCraft Studio* |
+
+*Note: If you used the basic `npm run db:seed`, use `admin@ashland.edu` / `Admin123!`, `student@ashland.edu` / `Student123!`, or `founder@techcorp.com` / `Founder123!`.*
+
+---
+
 ## Environment variables
 
 Copy `backend/.env.example` to `backend/.env` and set:

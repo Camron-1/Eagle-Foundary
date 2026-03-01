@@ -25,6 +25,23 @@ export const listOrgsQuerySchema = z.object({
     search: z.string().optional(),
 });
 
+export const listOrgJoinRequestsQuerySchema = z.object({
+    cursor: z.string().optional(),
+    limit: z.string().optional().transform((val) => {
+        if (!val) return 20;
+        const num = parseInt(val, 10);
+        return isNaN(num) ? 20 : Math.min(Math.max(1, num), 100);
+    }),
+    status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
+});
+
+export const reviewOrgJoinRequestSchema = z.object({
+    action: z.enum(['APPROVE', 'REJECT']),
+    adminNote: z.string().max(500).optional().nullable(),
+});
+
 export type UpdateOrgInput = z.infer<typeof updateOrgSchema>;
 export type AddMemberInput = z.infer<typeof addMemberSchema>;
 export type ListOrgsQuery = z.infer<typeof listOrgsQuerySchema>;
+export type ListOrgJoinRequestsQuery = z.infer<typeof listOrgJoinRequestsQuerySchema>;
+export type ReviewOrgJoinRequestInput = z.infer<typeof reviewOrgJoinRequestSchema>;

@@ -17,6 +17,17 @@ process.env.OTP_MAX_ATTEMPTS = '5';
 process.env.OTP_RESEND_COOLDOWN_SECONDS = '60';
 process.env.OTP_SEND_LIMIT_PER_HOUR = '5';
 process.env.OTP_HASH_PEPPER = 'test-otp-pepper-secret-min-32-chars';
+process.env.MFA_ENCRYPTION_KEY = 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=';
+process.env.MFA_CHALLENGE_TTL_MINUTES = '5';
+process.env.MFA_MAX_ATTEMPTS = '5';
+process.env.MFA_ISSUER = 'Eagle-Foundry-Test';
+process.env.MFA_BACKUP_CODES_COUNT = '10';
+process.env.MFA_BACKUP_CODE_PEPPER = 'test-mfa-backup-pepper-secret-min-32';
+process.env.FIELD_ENCRYPTION_HASH_PEPPER = 'test-field-encryption-pepper-min-32';
+process.env.E2EE_REQUIRED = 'false';
+process.env.E2EE_ALLOW_LEGACY_THREADS = 'true';
+process.env.LOGIN_MAX_FAILED_ATTEMPTS = '5';
+process.env.LOGIN_LOCKOUT_MINUTES = '30';
 process.env.AWS_REGION = 'us-east-1';
 process.env.AWS_ACCESS_KEY_ID = 'test-access-key';
 process.env.AWS_SECRET_ACCESS_KEY = 'test-secret-key';
@@ -44,6 +55,12 @@ vi.mock('@aws-sdk/client-ses', () => ({
 vi.mock('@aws-sdk/client-sqs', () => ({
     SQSClient: vi.fn(),
     SendMessageCommand: vi.fn(),
+}));
+
+vi.mock('@aws-sdk/client-kms', () => ({
+    KMSClient: vi.fn(),
+    EncryptCommand: vi.fn(),
+    DecryptCommand: vi.fn(),
 }));
 
 // Mock Prisma

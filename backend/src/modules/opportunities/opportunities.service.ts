@@ -17,7 +17,7 @@ export async function createOpportunity(orgId: string, data: CreateOpportunityIn
         throw new NotFoundError('Organization');
     }
 
-    if (org.status !== OrgStatus.ACTIVE) {
+    if (org.status !== OrgStatus.ACTIVE || org.verificationStatus !== 'APPROVED') {
         throw new AppError(ErrorCode.ORG_SUSPENDED, 'Organization is not active', 403);
     }
 
@@ -45,7 +45,8 @@ export async function getOpportunityById(id: string, _userId?: string, orgId?: s
     // If published and org is active, anyone can view
     if (
         opportunity.status === OpportunityStatus.PUBLISHED &&
-        opportunity.org.status === OrgStatus.ACTIVE
+        opportunity.org.status === OrgStatus.ACTIVE &&
+        opportunity.org.verificationStatus === 'APPROVED'
     ) {
         return opportunity;
     }

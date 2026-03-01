@@ -4,6 +4,23 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 export const logger = pino({
     level: process.env.LOG_LEVEL || 'info',
+    redact: {
+        paths: [
+            'req.headers.authorization',
+            'headers.authorization',
+            'password',
+            'passwordHash',
+            'code',
+            'otp',
+            'refreshToken',
+            'accessToken',
+            'backupCode',
+            'challengeToken',
+            'ciphertext',
+            'wrappedThreadKey',
+        ],
+        censor: '[REDACTED]',
+    },
     ...(isDevelopment
         ? {
             transport: {

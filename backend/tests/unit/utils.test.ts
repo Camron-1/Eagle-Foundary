@@ -1,72 +1,119 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import request from 'supertest';
-import express from 'express';
-import { generateOtp, hashOtp, verifyOtp } from '@utils/security.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+    buildTotpUri,
+    decryptSensitiveValue,
+    encryptSensitiveValue,
+    generateBackupCodes,
+    generateOtp,
+    generateTotpCode,
+    generateTotpSecret,
+    hashBackupCode,
+    hashOtp,
+    verifyBackupCode,
+    verifyOtp,
+    verifyTotpCode,
+} from '@utils/security.js';
 import { isStudentEmail, isValidCompanyEmail, normalizeEmail } from '@utils/emailRules.js';
-import { success, paginated } from '@utils/response.js';
+import { paginated, success } from '@utils/response.js';
+import { decryptTextValue, encryptTextValue } from '@utils/fieldEncryption.js';
+import { hashForBlindIndex } from '@connectors/kms.js';
 
-// Simple health check test
-describe('Health Check', () => {
-    const app = express();
-
-    app.get('/health', (req, res) => {
-        res.status(200).json({
-            status: 'healthy',
-            timestamp: new Date().toISOString(),
-        });
-    });
-
-    it('should return healthy status', async () => {
-        const response = await request(app).get('/health');
-
-        expect(response.status).toBe(200);
-        expect(response.body.status).toBe('healthy');
-        expect(response.body.timestamp).toBeDefined();
-    });
-});
-
-// Utility function tests
 describe('Security Utils', () => {
     beforeEach(() => {
         vi.resetModules();
     });
 
-    it('should generate a 6-digit OTP', () => {
+    it('generates a 6-digit OTP', () => {
         const otp = generateOtp();
         expect(otp).toMatch(/^\d{6}$/);
     });
 
-    it('should hash and verify OTP correctly', async () => {
+    it('hashes and verifies OTP values correctly', () => {
         const otp = '123456';
-        const hash = await hashOtp(otp);
+        const hash = hashOtp(otp);
 
-        expect(await verifyOtp(otp, hash)).toBe(true);
-        expect(await verifyOtp('654321', hash)).toBe(false);
+        expect(verifyOtp(otp, hash)).toBe(true);
+        expect(verifyOtp('654321', hash)).toBe(false);
+    });
+
+    it('generates and verifies TOTP codes', () => {
+        const secret = generateTotpSecret();
+        const code = generateTotpCode(secret);
+
+        expect(secret).toMatch(/^[A-Z2-7]+$/);
+        expect(code).toMatch(/^\d{6}$/);
+        expect(verifyTotpCode(secret, code)).toBe(true);
+    });
+
+    it('builds otpauth URI with issuer and account label', () => {
+        const secret = generateTotpSecret();
+        const uri = buildTotpUri('user@test.edu', secret);
+
+        expect(uri.startsWith('otpauth://totp/')).toBe(true);
+        expect(uri.includes('secret=')).toBe(true);
+        expect(uri.includes('issuer=')).toBe(true);
+    });
+
+    it('encrypts and decrypts sensitive values', () => {
+        const plain = 'MY-SUPER-SECRET';
+        const encrypted = encryptSensitiveValue(plain);
+        const decrypted = decryptSensitiveValue(encrypted);
+
+        expect(encrypted).not.toBe(plain);
+        expect(decrypted).toBe(plain);
+    });
+
+    it('encrypts and decrypts field envelopes with context binding', async () => {
+        const plain = 'secure-file-key';
+        const envelope = await encryptTextValue(plain, 'file_s3_key', 'abc-123');
+        const decrypted = await decryptTextValue(envelope, 'file_s3_key', 'abc-123');
+
+        expect(envelope.ciphertext).not.toBe(plain);
+        expect(decrypted).toBe(plain);
+    });
+
+    it('generates stable blind index hashes', () => {
+        const hash1 = hashForBlindIndex('message-key');
+        const hash2 = hashForBlindIndex('message-key');
+        const hash3 = hashForBlindIndex('message-key-2');
+
+        expect(hash1).toBe(hash2);
+        expect(hash1).not.toBe(hash3);
+    });
+
+    it('generates backup codes and verifies hashed values', () => {
+        const backupCodes = generateBackupCodes(5);
+        expect(backupCodes).toHaveLength(5);
+        expect(new Set(backupCodes).size).toBe(5);
+
+        for (const backupCode of backupCodes) {
+            expect(backupCode).toMatch(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/);
+            const hash = hashBackupCode(backupCode);
+            expect(verifyBackupCode(backupCode, hash)).toBe(true);
+            expect(verifyBackupCode('AAAA-BBBB', hash)).toBe(false);
+        }
     });
 });
 
-// Email rules tests
 describe('Email Rules', () => {
-    it('should validate student email domain', () => {
-        expect(isStudentEmail('student@test.edu')).toBe(true); // Using mocked setup env
+    it('validates student email domain', () => {
+        expect(isStudentEmail('student@test.edu')).toBe(true);
         expect(isStudentEmail('student@other.edu')).toBe(false);
-        // Note: setup.ts sets STUDENT_EMAIL_DOMAIN='test.edu'
     });
 
-    it('should block public email domains for companies', () => {
+    it('blocks public email domains for companies', () => {
         expect(isValidCompanyEmail('employee@gmail.com')).toBe(false);
         expect(isValidCompanyEmail('employee@yahoo.com')).toBe(false);
         expect(isValidCompanyEmail('employee@company.com')).toBe(true);
     });
 
-    it('should normalize email addresses', () => {
+    it('normalizes email addresses', () => {
         expect(normalizeEmail('  Test@Example.COM  ')).toBe('test@example.com');
     });
 });
 
-// Response utility tests
 describe('Response Utils', () => {
-    it('should format success response correctly', () => {
+    it('formats success response correctly', () => {
         const mockRes = {
             status: vi.fn().mockReturnThis(),
             json: vi.fn(),
@@ -81,7 +128,7 @@ describe('Response Utils', () => {
         });
     });
 
-    it('should format paginated response correctly', () => {
+    it('formats paginated response correctly', () => {
         const mockRes = {
             status: vi.fn().mockReturnThis(),
             json: vi.fn(),
@@ -95,7 +142,7 @@ describe('Response Utils', () => {
             data: [{ id: 1 }],
             meta: {
                 pagination: { nextCursor: 'abc', hasMore: true },
-            }
+            },
         });
     });
 });

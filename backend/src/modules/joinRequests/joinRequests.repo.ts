@@ -1,6 +1,15 @@
 import { db } from '../../connectors/db.js';
+import type { Prisma } from '@prisma/client';
 
 type JoinRequestStatusType = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
+
+function toInputJson(value: Record<string, unknown> | null | undefined): Prisma.InputJsonValue | undefined {
+    if (value == null) {
+        return undefined;
+    }
+
+    return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+}
 
 /**
  * Create join request
@@ -10,13 +19,15 @@ export async function createJoinRequest(data: {
     profileId: string;
     message?: string | null;
     formAnswers?: Record<string, unknown> | null;
+    sensitivePayloadEncrypted?: Record<string, unknown> | null;
 }) {
     return db.joinRequest.create({
         data: {
             startupId: data.startupId,
             profileId: data.profileId,
             message: data.message,
-            formAnswers: data.formAnswers ?? undefined,
+            formAnswers: toInputJson(data.formAnswers),
+            sensitivePayloadEncrypted: toInputJson(data.sensitivePayloadEncrypted),
             status: 'PENDING',
         },
         include: {

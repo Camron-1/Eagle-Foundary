@@ -33,6 +33,7 @@ import { requireStudent, requireCompanyMember } from './middlewares/rbac.js';
 import { createJoinRequestSchema } from './modules/joinRequests/joinRequests.validators.js';
 
 const app = express();
+app.disable('x-powered-by');
 
 // Initialize Sentry
 initSentry();

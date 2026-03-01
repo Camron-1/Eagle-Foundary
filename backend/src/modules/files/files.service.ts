@@ -5,6 +5,8 @@ import { ErrorCode } from '../../utils/response.js';
 import { FileContextType, FileContextTypeType } from '../../config/constants.js';
 import { createUploadToken, verifyUploadToken } from '../../utils/uploadToken.js';
 import { PresignUploadInput, ConfirmUploadInput } from './files.validators.js';
+import { hashForBlindIndex } from '../../connectors/kms.js';
+import { decryptTextValue, encryptTextValue, type EncryptedEnvelope } from '../../utils/fieldEncryption.js';
 
 const UUID_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -72,9 +74,14 @@ export async function confirmUpload(userId: string, data: ConfirmUploadInput) {
         return existingFile;
     }
 
+    const s3KeyEncrypted = await encryptTextValue(data.key, 'file_s3_key', data.key);
+
     const file = await db.file.create({
         data: {
             s3Key: data.key,
+            s3KeyEncrypted: s3KeyEncrypted as unknown as object,
+            s3KeyHash: hashForBlindIndex(data.key),
+            encryptionKeyVersion: s3KeyEncrypted.keyVersion,
             filename: parsed.filename,
             mimeType: tokenPayload.mimeType,
             sizeBytes: tokenPayload.sizeBytes,
@@ -104,7 +111,9 @@ export async function getDownloadUrl(userId: string, fileId: string) {
         await validateContextAccess(userId, file.context as FileContextTypeType, file.contextId);
     }
 
-    const url = await generatePresignedDownloadUrl(file.s3Key);
+    const hydratedFile = await ensureEncryptedFileKeyRecord(file);
+    const objectKey = await resolveS3Key(hydratedFile);
+    const url = await generatePresignedDownloadUrl(objectKey);
 
     return {
         url: url.downloadUrl,
@@ -132,10 +141,53 @@ export async function deleteUploadedFile(userId: string, fileId: string) {
     }
 
     // Delete from S3
-    await deleteFile(file.s3Key);
+    await deleteFile(await resolveS3Key(file));
 
     // Delete record
     await db.file.delete({ where: { id: fileId } });
+}
+
+async function resolveS3Key(file: {
+    id: string;
+    s3Key: string;
+    s3KeyEncrypted: unknown;
+}): Promise<string> {
+    if (file.s3KeyEncrypted && typeof file.s3KeyEncrypted === 'object') {
+        try {
+            return await decryptTextValue(
+                file.s3KeyEncrypted as EncryptedEnvelope,
+                'file_s3_key',
+                file.s3Key
+            );
+        } catch {
+            // Keep compatibility with legacy records and migration phase.
+            return file.s3Key;
+        }
+    }
+
+    return file.s3Key;
+}
+
+async function ensureEncryptedFileKeyRecord(file: {
+    id: string;
+    s3Key: string;
+    s3KeyEncrypted: unknown;
+    s3KeyHash: string | null;
+    encryptionKeyVersion: number | null;
+}) {
+    if (file.s3KeyEncrypted && file.s3KeyHash && file.encryptionKeyVersion) {
+        return file;
+    }
+
+    const encrypted = await encryptTextValue(file.s3Key, 'file_s3_key', file.s3Key);
+    return db.file.update({
+        where: { id: file.id },
+        data: {
+            s3KeyEncrypted: encrypted as unknown as object,
+            s3KeyHash: hashForBlindIndex(file.s3Key),
+            encryptionKeyVersion: encrypted.keyVersion,
+        },
+    });
 }
 
 /**
@@ -183,6 +235,15 @@ async function validateContextAccess(
             // Must be company admin
             if (user.orgId !== contextId || user.role !== 'COMPANY_ADMIN') {
                 throw new ForbiddenError('Cannot upload to this organization');
+            }
+            break;
+
+        case FileContextType.ORG_VERIFICATION_DOCUMENT:
+            if (user.role === 'UNIVERSITY_ADMIN') {
+                break;
+            }
+            if (user.orgId !== contextId || user.role !== 'COMPANY_ADMIN') {
+                throw new ForbiddenError('Cannot access organization verification documents');
             }
             break;
 

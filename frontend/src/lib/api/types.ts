@@ -1,13 +1,38 @@
 export type UserRole = 'STUDENT' | 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'UNIVERSITY_ADMIN';
-export type UserStatus = 'PENDING_OTP' | 'ACTIVE' | 'SUSPENDED';
+export type UserStatus =
+  | 'PENDING_OTP'
+  | 'PENDING_ORG_VERIFICATION'
+  | 'PENDING_ORG_APPROVAL'
+  | 'ACTIVE'
+  | 'SUSPENDED';
 export type OrgStatus = 'PENDING_OTP' | 'ACTIVE' | 'SUSPENDED';
+export type OrgVerificationStatus = 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+export type OrgJoinRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type StartupStatus = 'DRAFT' | 'SUBMITTED' | 'NEEDS_CHANGES' | 'APPROVED' | 'ARCHIVED' | 'REJECTED';
 export type OpportunityStatus = 'DRAFT' | 'PUBLISHED' | 'CLOSED';
 export type ApplicationStatus = 'SUBMITTED' | 'SHORTLISTED' | 'INTERVIEW' | 'SELECTED' | 'REJECTED' | 'WITHDRAWN';
 export type JoinRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED';
 export type ReportStatus = 'PENDING' | 'REVIEWING' | 'RESOLVED' | 'DISMISSED';
 export type BudgetType = 'paid' | 'unpaid' | 'equity';
-export type FileContext = 'startup_logo' | 'startup_media' | 'resume' | 'portfolio' | 'opportunity' | 'org_logo' | 'application' | 'message';
+export type FileContext =
+  | 'startup_logo'
+  | 'startup_media'
+  | 'resume'
+  | 'portfolio'
+  | 'opportunity'
+  | 'org_logo'
+  | 'application'
+  | 'message'
+  | 'org_verification_document';
+export type LoginNextStep = 'MFA_SETUP' | 'MFA_VERIFY';
+
+export interface PendingContext {
+  type: 'ORG_VERIFICATION_PENDING' | 'ORG_APPROVAL_PENDING' | 'ORG_APPROVAL_REJECTED';
+  orgName?: string;
+  reviewNotes?: string | null;
+  joinRequestStatus?: OrgJoinRequestStatus;
+  joinRequestNote?: string | null;
+}
 
 export interface User {
   id: string;
@@ -15,9 +40,23 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   orgId: string | null;
-  emailVerifiedAt: string | null;
+  mfaEnabled?: boolean;
+  emailVerifiedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  pendingContext?: PendingContext | null;
+  org?: {
+    id: string;
+    name: string;
+    status: OrgStatus;
+    verificationStatus: OrgVerificationStatus;
+    verificationReviewNotes: string | null;
+  } | null;
+  studentProfile?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  } | null;
 }
 
 export interface StudentProfile {
@@ -54,6 +93,11 @@ export interface Org {
   website: string | null;
   logoUrl: string | null;
   status: OrgStatus;
+  verificationStatus?: OrgVerificationStatus;
+  verificationSubmittedAt?: string | null;
+  verificationReviewedAt?: string | null;
+  verificationReviewNotes?: string | null;
+  verifiedDomains?: string[];
   isVerifiedBadge: boolean;
   createdAt: string;
   updatedAt: string;
@@ -143,6 +187,9 @@ export interface MessageThread {
   id: string;
   createdAt: string;
   updatedAt: string;
+  encryptionRequired?: boolean;
+  currentKeyVersion?: number;
+  isLegacyPlaintextThread?: boolean;
   joinRequest?: JoinRequest;
   application?: Application;
   messages?: Message[];
@@ -153,8 +200,41 @@ export interface Message {
   id: string;
   threadId: string;
   senderId: string;
-  content: string;
+  content: string | null;
+  ciphertext?: string | null;
+  iv?: string | null;
+  keyVersion?: number | null;
+  encryptionVersion?: number | null;
+  isEncrypted?: boolean;
+  senderKeyFingerprint?: string | null;
   createdAt: string;
+}
+
+export interface UserMessageKey {
+  userId: string;
+  publicKeyPem: string;
+  fingerprint: string;
+  algorithm: string;
+  createdAt: string;
+}
+
+export interface MessageKeyEnvelope {
+  userId: string;
+  keyVersion: number;
+  wrappedThreadKey: string;
+  recipientKeyFingerprint: string;
+  wrappedByUserId?: string;
+  createdAt?: string;
+}
+
+export interface ThreadCryptoContext {
+  threadId: string;
+  encryptionRequired: boolean;
+  currentKeyVersion: number;
+  isLegacyPlaintextThread: boolean;
+  participants: string[];
+  keys: UserMessageKey[];
+  keyEnvelopes: MessageKeyEnvelope[];
 }
 
 export interface Notification {
@@ -171,9 +251,11 @@ export interface Notification {
 export interface Report {
   id: string;
   reporterId: string;
-  targetType: 'startup' | 'opportunity' | 'user' | 'message';
+  targetType: 'STARTUP' | 'OPPORTUNITY' | 'USER' | 'MESSAGE' | 'ORG';
   targetId: string;
   reporterReason: string;
+  evidenceText: string | null;
+  evidenceMessageId: string | null;
   status: ReportStatus;
   resolution: string | null;
   adminNotes: string | null;
@@ -220,6 +302,13 @@ export interface CompanySignupPayload {
   companyName: string;
   firstName: string;
   lastName: string;
+  verificationDocumentKeys: string[];
+}
+
+export interface CompanyDocUploadPayload {
+  filename: string;
+  mimeType: 'application/pdf';
+  sizeBytes: number;
 }
 
 export interface LoginPayload {
@@ -244,6 +333,25 @@ export interface ResetPasswordPayload {
   email: string;
   code: string;
   newPassword: string;
+}
+
+export interface MfaSetupStartPayload {
+  challengeToken: string;
+}
+
+export interface MfaSetupCompletePayload {
+  challengeToken: string;
+  code: string;
+}
+
+export interface MfaVerifyPayload {
+  challengeToken: string;
+  code?: string;
+  backupCode?: string;
+}
+
+export interface MfaRegenerateBackupCodesPayload {
+  code: string;
 }
 
 export interface UpdateStudentProfilePayload {
@@ -307,7 +415,13 @@ export interface UpdateJoinRequestPayload {
 }
 
 export interface SendMessagePayload {
-  content: string;
+  content?: string;
+  ciphertext?: string;
+  iv?: string;
+  keyVersion?: number;
+  encryptionVersion?: number;
+  senderKeyFingerprint?: string;
+  keyEnvelopes?: MessageKeyEnvelope[];
 }
 
 export interface UpdateOrgPayload {
@@ -320,6 +434,11 @@ export interface UpdateOrgPayload {
 export interface AddOrgMemberPayload {
   email: string;
   role: 'COMPANY_ADMIN' | 'COMPANY_MEMBER';
+}
+
+export interface ReviewOrgJoinRequestPayload {
+  action: 'APPROVE' | 'REJECT';
+  adminNote?: string | null;
 }
 
 export interface PresignUploadPayload {
@@ -337,9 +456,11 @@ export interface PresignResumePayload {
 }
 
 export interface CreateReportPayload {
-  targetType: 'startup' | 'opportunity' | 'user' | 'message';
+  targetType: 'STARTUP' | 'OPPORTUNITY' | 'USER' | 'MESSAGE' | 'ORG';
   targetId: string;
   reporterReason: string;
+  evidenceText?: string | null;
+  evidenceMessageId?: string | null;
 }
 
 export interface ReviewStartupPayload {
@@ -358,6 +479,12 @@ export interface UpdateOrgStatusPayload {
 export interface ResolveReportPayload {
   resolution: 'RESOLVED' | 'DISMISSED';
   adminNotes?: string | null;
+}
+
+export interface ReviewOrgVerificationPayload {
+  action: 'APPROVE' | 'REJECT';
+  reviewNotes?: string | null;
+  verifiedDomains?: string[];
 }
 
 // ----- Response wrappers -----
@@ -381,8 +508,10 @@ export interface AuthTokens {
 }
 
 export interface LoginResponse {
-  accessToken: string;
+  accessToken?: string;
   expiresIn?: string;
+  nextStep?: LoginNextStep;
+  challengeToken?: string;
 }
 
 export interface PresignResponse {
@@ -397,6 +526,77 @@ export interface AdminDashboardStats {
   organizations: number;
   pendingStartups: number;
   openReports: number;
+}
+
+export interface CompanyDocUploadResponse {
+  uploadUrl: string;
+  key: string;
+  expiresAt: string;
+}
+
+export interface MfaSetupStartResponse {
+  secret: string;
+  otpauthUrl: string;
+}
+
+export interface MfaSetupCompleteResponse extends AuthTokens {
+  backupCodes: string[];
+}
+
+export interface MfaVerifyResponse extends AuthTokens {
+  usedBackupCode: boolean;
+}
+
+export interface MfaStatus {
+  mfaEnabled: boolean;
+  backupCodesRemaining: number;
+}
+
+export interface MfaBackupCodesResponse {
+  backupCodes: string[];
+}
+
+export interface AuthSession {
+  id: string;
+  userAgent: string | null;
+  createdAt: string;
+  lastUsedAt: string;
+  expiresAt: string;
+  isCurrent: boolean;
+}
+
+export interface RevokeOtherSessionsResponse {
+  revokedCount: number;
+}
+
+export interface OrgJoinRequest {
+  id: string;
+  orgId: string;
+  userId: string;
+  status: OrgJoinRequestStatus;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
+  adminNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user?: User;
+}
+
+export interface OrgVerificationDocument {
+  id: string;
+  filename: string;
+  createdAt: string;
+  downloadUrl: string;
+  expiresAt: string;
+}
+
+export interface OrgVerificationDocumentListResponse {
+  org: { id: string; name: string };
+  items: OrgVerificationDocument[];
+}
+
+export interface AdminResetMfaResponse {
+  success: boolean;
 }
 
 export interface SearchResult {

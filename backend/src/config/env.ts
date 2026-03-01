@@ -50,6 +50,30 @@ const envSchema = z.object({
     OTP_SEND_LIMIT_PER_HOUR: z.string().transform(Number).default('5'),
     OTP_HASH_PEPPER: z.string().min(16),
 
+    // MFA Configuration
+    MFA_ENCRYPTION_KEY: z.string().min(44), // 32-byte base64 key
+    MFA_CHALLENGE_TTL_MINUTES: z.string().transform(Number).default('5'),
+    MFA_MAX_ATTEMPTS: z.string().transform(Number).default('5'),
+    MFA_ISSUER: z.string().default('Eagle-Foundry'),
+    MFA_BACKUP_CODES_COUNT: z.string().transform(Number).default('10'),
+    MFA_BACKUP_CODE_PEPPER: z.string().min(16),
+
+    // Field encryption + KMS
+    AWS_KMS_KEY_ID: z.string().optional(),
+    FIELD_ENCRYPTION_HASH_PEPPER: z.string().min(16),
+    E2EE_REQUIRED: z
+        .enum(['true', 'false'])
+        .default('false')
+        .transform((v) => v === 'true'),
+    E2EE_ALLOW_LEGACY_THREADS: z
+        .enum(['true', 'false'])
+        .default('true')
+        .transform((v) => v === 'true'),
+
+    // Login lockout
+    LOGIN_MAX_FAILED_ATTEMPTS: z.string().transform(Number).default('5'),
+    LOGIN_LOCKOUT_MINUTES: z.string().transform(Number).default('30'),
+
     // AWS
     AWS_REGION: z.string().default('us-east-1'),
     AWS_ACCESS_KEY_ID: z.string().optional(),

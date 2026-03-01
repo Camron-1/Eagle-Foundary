@@ -29,7 +29,16 @@ export async function confirmUpload(
 ): Promise<void> {
     try {
         const file = await filesService.confirmUpload(req.user!.userId, req.body);
-        success(res, file);
+        success(res, {
+            id: file.id,
+            filename: file.filename,
+            mimeType: file.mimeType,
+            sizeBytes: file.sizeBytes,
+            context: file.context,
+            contextId: file.contextId,
+            uploadedBy: file.uploadedBy,
+            createdAt: file.createdAt,
+        });
     } catch (error) {
         next(error);
     }

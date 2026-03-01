@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, UserStatus, OrgStatus } from '@prisma/client';
+import { PrismaClient, UserRole, UserStatus, OrgStatus, OrgVerificationStatus } from '@prisma/client';
 import { hashPassword } from '../src/utils/security.js';
 
 const prisma = new PrismaClient();
@@ -64,6 +64,8 @@ async function main() {
             website: 'https://techcorp.com',
             status: OrgStatus.ACTIVE,
             isVerifiedBadge: true,
+            verificationStatus: OrgVerificationStatus.APPROVED,
+            verifiedDomains: ['techcorp.com'],
         }
     });
 
@@ -77,6 +79,8 @@ async function main() {
                 website: 'https://techcorp.com',
                 status: OrgStatus.ACTIVE,
                 isVerifiedBadge: true,
+                verificationStatus: OrgVerificationStatus.APPROVED,
+                verifiedDomains: ['techcorp.com'],
             }
         });
 

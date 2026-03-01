@@ -8,6 +8,43 @@ import { StartupMemberRole } from '../../config/constants.js';
 import { publish } from '../../events/publish.js';
 import { buildJoinRequestCreatedEvent, buildJoinRequestAcceptedEvent } from '../../events/builders.js';
 import { CreateJoinRequestInput, ListJoinRequestsQuery } from './joinRequests.validators.js';
+import { encryptJsonValue } from '../../utils/fieldEncryption.js';
+
+const SENSITIVE_JOIN_FORM_KEYS = new Set([
+    'address',
+    'phone',
+    'dob',
+    'dateOfBirth',
+    'ssn',
+    'governmentId',
+    'taxId',
+    'passportNumber',
+    'licenseNumber',
+]);
+
+function splitSensitiveJoinAnswers(
+    value: Record<string, unknown> | undefined
+): { publicAnswers?: Record<string, unknown>; sensitiveAnswers?: Record<string, unknown> } {
+    if (!value) {
+        return {};
+    }
+
+    const publicAnswers: Record<string, unknown> = {};
+    const sensitiveAnswers: Record<string, unknown> = {};
+
+    for (const [key, item] of Object.entries(value)) {
+        if (SENSITIVE_JOIN_FORM_KEYS.has(key)) {
+            sensitiveAnswers[key] = item;
+        } else {
+            publicAnswers[key] = item;
+        }
+    }
+
+    return {
+        publicAnswers: Object.keys(publicAnswers).length > 0 ? publicAnswers : undefined,
+        sensitiveAnswers: Object.keys(sensitiveAnswers).length > 0 ? sensitiveAnswers : undefined,
+    };
+}
 
 /**
  * Create join request
@@ -53,11 +90,21 @@ export async function createJoinRequest(
         throw new AppError(ErrorCode.CONFLICT, 'You already have a pending join request', 409);
     }
 
+    const splitAnswers = splitSensitiveJoinAnswers(data.formAnswers as Record<string, unknown> | undefined);
+    const sensitivePayloadEncrypted = splitAnswers.sensitiveAnswers
+        ? await encryptJsonValue(
+            splitAnswers.sensitiveAnswers,
+            'join_request_form_answers',
+            `${startupId}:${profile.id}`
+        ) as unknown as Record<string, unknown>
+        : undefined;
+
     const joinRequest = await joinRequestsRepo.createJoinRequest({
         startupId,
         profileId: profile.id,
         message: data.message,
-        formAnswers: data.formAnswers as Record<string, unknown> | undefined,
+        formAnswers: splitAnswers.publicAnswers,
+        sensitivePayloadEncrypted,
     });
 
     // Find founder for notification

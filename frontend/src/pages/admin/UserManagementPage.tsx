@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/select';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { TableSkeleton } from '@/components/ui/skeleton';
 import { toast } from '@/components/ui/toast';
+import { ApiError, parseApiError } from '@/lib/api/errors';
 
 export default function UserManagementPage(): JSX.Element {
   const queryClient = useQueryClient();
@@ -22,6 +23,7 @@ export default function UserManagementPage(): JSX.Element {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [newStatus, setNewStatus] = useState<'ACTIVE' | 'SUSPENDED'>('ACTIVE');
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [resetMfaTarget, setResetMfaTarget] = useState<User | null>(null);
 
   const { data: usersData = [], isLoading } = useQuery({
     queryKey: ['admin', 'users', statusFilter],
@@ -59,8 +61,24 @@ export default function UserManagementPage(): JSX.Element {
       setSelectedUser(null);
       setConfirmOpen(false);
     },
-    onError: (err: { message?: string }) => {
-      toast.error(err?.message ?? 'Failed to update status');
+    onError: (err) => {
+      const apiErr = err instanceof ApiError ? err : parseApiError(err);
+      toast.error(apiErr.message);
+    },
+  });
+
+  const resetMfaMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await api.post(endpoints.admin.resetUserMfa(userId), {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      toast.success('User MFA has been reset');
+      setResetMfaTarget(null);
+    },
+    onError: (err) => {
+      const apiErr = err instanceof ApiError ? err : parseApiError(err);
+      toast.error(apiErr.message);
     },
   });
 
@@ -68,15 +86,6 @@ export default function UserManagementPage(): JSX.Element {
     setSelectedUser(user);
     setNewStatus(user.status === 'SUSPENDED' ? 'ACTIVE' : user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE');
     setManageModalOpen(true);
-  };
-
-  const handleSaveStatus = () => {
-    setConfirmOpen(true);
-  };
-
-  const confirmSave = () => {
-    setConfirmOpen(false);
-    updateStatusMutation.mutate();
   };
 
   const columns: Column<User & Record<string, unknown>>[] = [
@@ -96,19 +105,36 @@ export default function UserManagementPage(): JSX.Element {
       render: (row) => <Badge>{row.status as UserStatus}</Badge>,
     },
     {
+      key: 'mfa',
+      header: 'MFA',
+      render: (row) => <Badge>{row.mfaEnabled ? 'Enabled' : 'Disabled'}</Badge>,
+    },
+    {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <Button
-          variant="ghost"
-          className="h-8 px-3 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            openManage(row);
-          }}
-        >
-          Manage
-        </Button>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            className="h-8 px-3 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              setResetMfaTarget(row);
+            }}
+          >
+            Reset MFA
+          </Button>
+          <Button
+            variant="ghost"
+            className="h-8 px-3 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              openManage(row);
+            }}
+          >
+            Manage
+          </Button>
+        </div>
       ),
     },
   ];
@@ -123,7 +149,7 @@ export default function UserManagementPage(): JSX.Element {
           User Management
         </h1>
         <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
-          Search and manage user accounts, roles, and status.
+          Search and manage user accounts, roles, status, and MFA state.
         </p>
       </header>
 
@@ -153,13 +179,15 @@ export default function UserManagementPage(): JSX.Element {
               { value: 'ACTIVE', label: 'Active' },
               { value: 'SUSPENDED', label: 'Suspended' },
               { value: 'PENDING_OTP', label: 'Pending OTP' },
+              { value: 'PENDING_ORG_VERIFICATION', label: 'Pending Org Verification' },
+              { value: 'PENDING_ORG_APPROVAL', label: 'Pending Org Approval' },
             ],
           },
         ]}
       />
 
       {isLoading ? (
-        <TableSkeleton rows={8} cols={4} />
+        <TableSkeleton rows={8} cols={5} />
       ) : (
         <DataTable columns={columns} data={tableData} emptyMessage="No users found" />
       )}
@@ -187,7 +215,7 @@ export default function UserManagementPage(): JSX.Element {
               <Button variant="ghost" onClick={() => setManageModalOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" withBorderEffect={false} onClick={handleSaveStatus} disabled={updateStatusMutation.isPending}>
+              <Button variant="primary" withBorderEffect={false} onClick={() => setConfirmOpen(true)} disabled={updateStatusMutation.isPending}>
                 Save
               </Button>
             </div>
@@ -198,11 +226,27 @@ export default function UserManagementPage(): JSX.Element {
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={confirmSave}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          updateStatusMutation.mutate();
+        }}
         title="Confirm status change"
         description={`Are you sure you want to change this user's status to ${newStatus}?`}
         confirmLabel="Confirm"
         loading={updateStatusMutation.isPending}
+      />
+
+      <ConfirmDialog
+        open={!!resetMfaTarget}
+        onClose={() => setResetMfaTarget(null)}
+        onConfirm={() => {
+          if (!resetMfaTarget) return;
+          resetMfaMutation.mutate(resetMfaTarget.id);
+        }}
+        title={`Reset MFA for ${resetMfaTarget?.email ?? 'this user'}?`}
+        description="This revokes all active sessions and requires MFA setup again on next login."
+        confirmLabel="Reset MFA"
+        loading={resetMfaMutation.isPending}
       />
     </div>
   );

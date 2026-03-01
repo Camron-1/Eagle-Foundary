@@ -17,14 +17,14 @@ function getThreadContext(thread: MessageThread): string {
 export default function MessagesPage(): JSX.Element {
   const navigate = useNavigate();
 
-  const { data: threads = [], isLoading } = useQuery({
+  const { data: threads = [], isLoading } = useQuery<MessageThread[]>({
     queryKey: ['messages', 'threads'],
     queryFn: async () => {
       const res = await api.get<{ data?: MessageThread[] } | MessageThread[]>(
         endpoints.messages.threads,
       );
       const body = res.data;
-      return (body && typeof body === 'object' && 'data' in body ? body.data : body) ?? [];
+      return ((body && typeof body === 'object' && 'data' in body ? body.data : body) ?? []) as MessageThread[];
     },
   });
 
@@ -40,7 +40,10 @@ export default function MessagesPage(): JSX.Element {
       key: 'lastMessage',
       header: 'Last Message',
       render: (row) => {
-        const preview = row.lastMessage?.content ?? row.messages?.[0]?.content ?? '—';
+        const last = row.lastMessage ?? row.messages?.[0];
+        const preview = last?.isEncrypted
+          ? 'New encrypted message'
+          : (last?.content ?? '—');
         const truncated = preview.length > 60 ? `${preview.slice(0, 60)}…` : preview;
         return <span className="text-zinc-400">{truncated}</span>;
       },
@@ -66,7 +69,7 @@ export default function MessagesPage(): JSX.Element {
     },
   ];
 
-  const tableData = threads.map((t) => ({ ...t } as MessageThread & Record<string, unknown>));
+  const tableData = threads.map((t: MessageThread) => ({ ...t } as MessageThread & Record<string, unknown>));
 
   return (
     <div className="space-y-8">

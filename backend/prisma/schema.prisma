@@ -16,6 +16,8 @@ datasource db {
 
 enum UserStatus {
   PENDING_OTP
+  PENDING_ORG_VERIFICATION
+  PENDING_ORG_APPROVAL
   ACTIVE
   SUSPENDED
 }
@@ -33,9 +35,26 @@ enum OrgStatus {
   SUSPENDED
 }
 
+enum OrgVerificationStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum OrgJoinRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum OtpPurpose {
   SIGNUP_VERIFY
   PASSWORD_RESET
+}
+
+enum AuthChallengeType {
+  MFA_SETUP
+  MFA_VERIFY
 }
 
 enum StartupStatus {
@@ -86,6 +105,14 @@ model User {
   role            UserRole
   status          UserStatus  @default(PENDING_OTP)
   emailVerifiedAt DateTime?
+
+  // MFA + lockout
+  mfaEnabled       Boolean    @default(false)
+  mfaSecretEncrypted String?
+  mfaEnabledAt     DateTime?
+  failedLoginCount Int        @default(0)
+  lastFailedLoginAt DateTime?
+  lockedUntil      DateTime?
   
   // For company users
   orgId           String?
@@ -96,6 +123,13 @@ model User {
   
   // Auth
   refreshTokens   RefreshToken[]
+  authChallenges  AuthChallenge[]
+  backupCodes     UserBackupCode[]
+  messageKey      UserMessageKey?
+  messageParticipants MessageThreadParticipant[]
+  messageKeyEnvelopes MessageKeyEnvelope[] @relation("MessageKeyEnvelopeRecipient")
+  wrappedMessageKeys MessageKeyEnvelope[] @relation("MessageKeyEnvelopeWrappedBy")
+  orgJoinRequest  OrgJoinRequest?
   
   // Notifications
   notifications   Notification[]
@@ -103,6 +137,7 @@ model User {
   // Admin relations
   reports         Report[]
   auditLogs       AuditLog[]
+  reviewedOrgJoinRequests OrgJoinRequest[] @relation("OrgJoinRequestReviewedBy")
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -116,6 +151,10 @@ model RefreshToken {
   tokenHash   String   @unique
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent   String?
+  ipHash      String?
+  lastUsedAt  DateTime @default(now())
+  revokedAt   DateTime?
   expiresAt   DateTime
   createdAt   DateTime @default(now())
   
@@ -151,10 +190,16 @@ model Org {
   logoUrl         String?
   status          OrgStatus @default(PENDING_OTP)
   isVerifiedBadge Boolean   @default(false)
+  verificationStatus OrgVerificationStatus @default(PENDING_REVIEW)
+  verificationSubmittedAt DateTime?
+  verificationReviewedAt DateTime?
+  verificationReviewNotes String?
+  verifiedDomains String[] @default([])
   
   // Relations
   members         User[]
   opportunities   Opportunity[]
+  joinRequests    OrgJoinRequest[]
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -258,6 +303,7 @@ model JoinRequest {
   profile     StudentProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   message     String?
   formAnswers Json?            // { firstName, lastName, address, resumeUrl, coverLetter, customAnswers: {} }
+  sensitivePayloadEncrypted Json?
   status      JoinRequestStatus @default(PENDING)
   
   // Messaging thread (created when accepted)
@@ -311,6 +357,7 @@ model Application {
   coverLetter   String?
   resumeUrl     String?
   formAnswers   Json?             // { firstName, lastName, address, customAnswers: {} } — coverLetter and resumeUrl are canonical on this model; strip them from formAnswers before saving
+  sensitivePayloadEncrypted Json?
   status        ApplicationStatus @default(SUBMITTED)
   
   // Messaging thread
@@ -347,9 +394,14 @@ model ApplicationStatusHistory {
 
 model MessageThread {
   id          String       @id @default(uuid())
+  encryptionRequired Boolean @default(true)
+  currentKeyVersion Int @default(1)
+  isLegacyPlaintextThread Boolean @default(false)
   
   // Relations
   messages    Message[]
+  participants MessageThreadParticipant[]
+  keyEnvelopes MessageKeyEnvelope[]
   joinRequest JoinRequest?
   application Application?
   
@@ -362,10 +414,61 @@ model Message {
   threadId  String
   thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   senderId  String        // userId
-  content   String
+  content   String?
+  ciphertext String?
+  iv String?
+  keyVersion Int?
+  encryptionVersion Int?
+  isEncrypted Boolean @default(false)
+  senderKeyFingerprint String?
   createdAt DateTime      @default(now())
   
   @@index([threadId, createdAt])
+  @@index([threadId, isEncrypted])
+}
+
+model UserMessageKey {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  publicKeyPem  String
+  fingerprint   String   @unique
+  algorithm     String   @default("RSA-OAEP-SHA256")
+  createdAt     DateTime @default(now())
+  revokedAt     DateTime?
+}
+
+model MessageThreadParticipant {
+  id        String   @id @default(uuid())
+  threadId  String
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedAt   DateTime @default(now())
+  removedAt DateTime?
+
+  @@unique([threadId, userId])
+  @@index([threadId])
+  @@index([userId, removedAt])
+}
+
+model MessageKeyEnvelope {
+  id                     String   @id @default(uuid())
+  threadId               String
+  thread                 MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  userId                 String
+  user                   User     @relation("MessageKeyEnvelopeRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  keyVersion             Int
+  wrappedThreadKey       String
+  recipientKeyFingerprint String
+  wrappedByUserId        String
+  wrappedByUser          User     @relation("MessageKeyEnvelopeWrappedBy", fields: [wrappedByUserId], references: [id], onDelete: Cascade)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([threadId, userId, keyVersion])
+  @@index([threadId, keyVersion])
+  @@index([userId, keyVersion])
 }
 
 // ============================================================================
@@ -389,6 +492,52 @@ model Notification {
   @@index([userId, createdAt])
 }
 
+model OrgJoinRequest {
+  id           String               @id @default(uuid())
+  orgId        String
+  org          Org                  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  userId       String               @unique
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       OrgJoinRequestStatus @default(PENDING)
+  reviewedBy   String?
+  reviewedByUser User?              @relation("OrgJoinRequestReviewedBy", fields: [reviewedBy], references: [id])
+  reviewedAt   DateTime?
+  adminNote    String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@index([orgId, status])
+  @@index([status])
+}
+
+model AuthChallenge {
+  id                  String            @id @default(uuid())
+  userId              String
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeHash       String            @unique
+  type                AuthChallengeType
+  tempSecretEncrypted String?
+  attempts            Int               @default(0)
+  expiresAt           DateTime
+  consumedAt          DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model UserBackupCode {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, usedAt])
+}
+
 // ============================================================================
 // MODERATION MODELS
 // ============================================================================
@@ -400,6 +549,8 @@ model Report {
   targetType     String       // 'startup' | 'opportunity' | 'user' | 'message'
   targetId       String
   reporterReason String
+  evidenceText   String?
+  evidenceMessageId String?
   status         ReportStatus @default(PENDING)
   resolution     String?
   adminNotes     String?
@@ -412,6 +563,7 @@ model Report {
   @@index([status])
   @@index([reporterId])
   @@index([targetType, targetId])
+  @@index([evidenceMessageId])
 }
 
 model AuditLog {
@@ -436,6 +588,9 @@ model AuditLog {
 model File {
   id          String   @id @default(uuid())
   s3Key       String   @unique  // S3 key
+  s3KeyEncrypted Json?
+  s3KeyHash    String? @unique
+  encryptionKeyVersion Int?
   filename    String
   mimeType    String
   sizeBytes   Int

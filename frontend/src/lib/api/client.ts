@@ -80,14 +80,18 @@ api.interceptors.response.use(
     }
 
     const requestUrl = original?.url ?? '';
-    const skipRefreshPaths = new Set([
+    const skipRefreshPaths: ReadonlySet<string> = new Set([
       endpoints.auth.login,
       endpoints.auth.refresh,
       endpoints.auth.logout,
       endpoints.auth.studentSignup,
+      endpoints.auth.companySignupDocumentUploadUrl,
       endpoints.auth.companySignup,
       endpoints.auth.verifyOtp,
       endpoints.auth.resendOtp,
+      endpoints.auth.mfaSetupStart,
+      endpoints.auth.mfaSetupComplete,
+      endpoints.auth.mfaVerify,
       endpoints.auth.forgotPassword,
       endpoints.auth.resetPassword,
     ]);
