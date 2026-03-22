@@ -5,7 +5,15 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className }: SkeletonProps): JSX.Element {
-  return <div className={cn('animate-pulse rounded-lg bg-white/5', className)} />;
+  return (
+    <div
+      className={cn(
+        'rounded-lg bg-gradient-to-r from-white/[0.04] via-white/[0.08] to-white/[0.04]',
+        'animate-pulse motion-reduce:animate-none',
+        className,
+      )}
+    />
+  );
 }
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }): JSX.Element {

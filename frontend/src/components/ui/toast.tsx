@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { useEffect } from 'react';
 import { X, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/cn';
 
 type ToastType = 'success' | 'error' | 'info';
@@ -41,20 +41,29 @@ function ToastItem({ item }: { item: ToastItem }): JSX.Element {
   const Icon = iconMap[item.type];
 
   return (
-    <div
+    <motion.div
+      layout
       role={item.type === 'info' ? 'status' : 'alert'}
       aria-live={item.type === 'info' ? 'polite' : 'assertive'}
       className={cn(
-        'flex items-start gap-3 rounded-xl border bg-zinc-950/95 px-4 py-3 shadow-lg backdrop-blur-lg animate-in slide-in-from-top-2',
+        'flex items-start gap-3 rounded-xl border bg-zinc-950/95 px-4 py-3 shadow-lg backdrop-blur-lg',
         colorMap[item.type],
       )}
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 24 }}
+      transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
     >
       <Icon size={18} className="mt-0.5 shrink-0" />
       <p className="flex-1 text-sm text-zinc-200">{item.message}</p>
-      <button onClick={() => remove(item.id)} aria-label="Dismiss notification" className="shrink-0 text-zinc-500 hover:text-zinc-300">
+      <button
+        onClick={() => remove(item.id)}
+        aria-label="Dismiss notification"
+        className="shrink-0 rounded p-0.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-300 focus-visible:ring-2 focus-visible:ring-white/30"
+      >
         <X size={14} />
       </button>
-    </div>
+    </motion.div>
   );
 }
 
@@ -63,9 +72,11 @@ export function ToastContainer(): JSX.Element {
 
   return (
     <div className="pointer-events-auto fixed right-4 top-4 z-[100] flex w-80 flex-col gap-2">
-      {toasts.map((t) => (
-        <ToastItem key={t.id} item={t} />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {toasts.map((t) => (
+          <ToastItem key={t.id} item={t} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
