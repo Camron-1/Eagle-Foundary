@@ -278,7 +278,7 @@ export async function updateProjectSubmissionStatus(
 
     const newStatus = data.status as ApplicationStatus;
 
-    const { updated, threadId } = await db.$transaction(async (tx) => {
+    const { updated } = await db.$transaction(async (tx) => {
         let txThreadId = submission.threadId;
         if (!txThreadId && (newStatus === ApplicationStatus.SHORTLISTED || newStatus === ApplicationStatus.SELECTED)) {
             const thread = await tx.messageThread.create({ data: {} });

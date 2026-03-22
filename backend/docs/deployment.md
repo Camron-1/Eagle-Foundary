@@ -94,4 +94,7 @@ Configure these in **Settings → Secrets and variables → Actions**:
 - **Lambda**: OTP email consumer (auto-deployed on `backend/lambda/**` changes).
 
 ### Environment Variables
-Ensure all required variables defined in `.env.example` are set in the ECS Task Definition or Parameter Store.
+
+Ensure all required variables defined in `.env.example` are set in the `.env.prod` file deployed to EC2 (via `PROD_ENV_FILE` secret).
+
+**Required secrets (min lengths):** `OTP_HASH_PEPPER` (min 16 chars), `MFA_ENCRYPTION_KEY` (min 44 chars, 32-byte base64), `MFA_BACKUP_CODE_PEPPER` (min 16 chars), `FIELD_ENCRYPTION_HASH_PEPPER` (min 16 chars). `UPLOAD_TOKEN_SECRET` is optional but must be min 32 chars if provided.

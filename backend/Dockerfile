@@ -23,7 +23,7 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 # Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init wget
 
 WORKDIR /app
 
@@ -61,6 +61,6 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Use dumb-init as PID 1, run migrations then start app
+# Use dumb-init as PID 1
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["/app/entrypoint.sh"]
