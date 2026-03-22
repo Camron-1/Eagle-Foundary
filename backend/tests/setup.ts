@@ -34,6 +34,8 @@ process.env.AWS_SECRET_ACCESS_KEY = 'test-secret-key';
 process.env.S3_BUCKET_NAME = 'test-bucket';
 process.env.SES_FROM_EMAIL = 'noreply@test.com';
 process.env.SQS_EVENTS_QUEUE_URL = 'https://sqs.us-east-1.amazonaws.com/123456789012/test-queue';
+// Ensure local key wrapping for field encryption (no KMS calls in tests)
+process.env.AWS_KMS_KEY_ID = '';
 
 // Mock AWS SDK
 vi.mock('@aws-sdk/client-s3', () => ({
