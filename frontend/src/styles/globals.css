@@ -87,6 +87,17 @@ a {
   isolation: isolate;
   border: 1px solid var(--btn-border);
   background: var(--btn-fill);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ef-button:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-button:active {
+    transform: none;
+  }
 }
 
 .ef-button.with-border-effect {
@@ -157,6 +168,18 @@ a {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ef-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-card:hover {
+    transform: none;
+  }
 }
 
 .ef-card::before,
@@ -301,4 +324,24 @@ a {
     opacity: 0.92;
     transform: translate(-48%, -50%) rotate(-4deg);
   }
+}
+
+/* Focus-visible ring for accessibility (buttons have their own; use for links, inputs, etc.) */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: none;
+}
+
+/* Buttons already have focus-visible via component; ensure fallback for custom elements */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
 }

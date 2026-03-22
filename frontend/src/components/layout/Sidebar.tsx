@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   LayoutDashboard,
   Rocket,
@@ -99,11 +100,15 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed }: SidebarProps): JSX.Element {
   const { isStudent, isCompanyAdmin, isCompanyMember, isUniversityAdmin } = useAuth();
-
-  if (collapsed) return <div className="w-0" />;
+  const reducedMotion = useReducedMotion();
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-white/10 bg-black/40 px-2 py-4 backdrop-blur-md">
+    <motion.aside
+      className="flex h-full shrink-0 flex-col overflow-hidden border-r border-white/10 bg-black/40 px-2 py-4 backdrop-blur-md"
+      initial={false}
+      animate={{ width: collapsed ? 0 : 224 }}
+      transition={reducedMotion ? { duration: 0 } : { type: 'tween', duration: 0.25, ease: 'easeOut' }}
+    >
       {isStudent && <NavGroup label="Student" items={studentNav} />}
       {(isCompanyAdmin || isCompanyMember) && <NavGroup label="Company" items={companyNav} />}
       {isUniversityAdmin && <NavGroup label="Admin" items={adminNav} />}
@@ -125,6 +130,6 @@ export function Sidebar({ collapsed }: SidebarProps): JSX.Element {
           </NavLink>
         </div>
       )}
-    </aside>
+    </motion.aside>
   );
 }
