@@ -8,6 +8,7 @@ import {
     loginRateLimiter,
     passwordResetRateLimiter,
     uploadRateLimiter,
+    mfaVerifyRateLimiter,
 } from '../../middlewares/rateLimit.js';
 import {
     companyDocUploadSchema,
@@ -86,7 +87,7 @@ router.post(
 
 router.post(
     '/mfa/verify',
-    authRateLimiter,
+    mfaVerifyRateLimiter,
     validateBody(mfaVerifySchema),
     authController.verifyMfa
 );

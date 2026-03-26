@@ -37,8 +37,18 @@ export function createRateLimiter(options: {
  */
 export const authRateLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10,
+    max: 20,
     message: 'Too many authentication attempts, please try again after 15 minutes',
+});
+
+/**
+ * Rate limiter for MFA verify endpoint
+ * 10 requests per 5 minutes
+ */
+export const mfaVerifyRateLimiter = createRateLimiter({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 10,
+    message: 'Too many MFA verification attempts, please try again after 5 minutes',
 });
 
 /**
