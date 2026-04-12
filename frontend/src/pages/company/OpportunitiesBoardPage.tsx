@@ -46,7 +46,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
     {
       key: 'title',
       header: 'Title',
-      render: (row) => <span className="text-zinc-200 font-medium">{row.title}</span>,
+      render: (row) => <span className="text-fg font-medium">{row.title}</span>,
     },
     {
       key: 'budgetType',
@@ -59,7 +59,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
       key: 'applications',
       header: 'Applications',
       render: (row) => (
-        <span className="text-zinc-400">
+        <span className="text-fg-muted">
           {row._count?.applications ?? 0}
         </span>
       ),
@@ -73,7 +73,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <span className="text-xs text-zinc-500">View / Edit</span>
+        <span className="text-xs text-fg-subtle">View / Edit</span>
       ),
     },
   ];
@@ -83,7 +83,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <h1 className="ef-heading-gradient text-4xl font-semibold leading-tight md:text-5xl">
             Company Opportunities
@@ -96,7 +96,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
             New Opportunity
           </Button>
         </div>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Create and manage opportunities for students.
         </p>
       </header>
@@ -122,7 +122,7 @@ export default function OpportunitiesBoardPage(): JSX.Element {
       />
 
       {isLoading ? (
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       ) : opportunities.length === 0 ? (
         <EmptyState
           title="No opportunities"

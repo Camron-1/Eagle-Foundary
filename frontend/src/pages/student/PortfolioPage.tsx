@@ -152,7 +152,7 @@ export default function PortfolioPage(): JSX.Element {
       header: 'Updated',
       render: (row) => {
         const d = row.updatedAt ? new Date(row.updatedAt) : null;
-        return <span className="text-zinc-400">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
+        return <span className="text-fg-muted">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
       },
     },
     {
@@ -166,7 +166,7 @@ export default function PortfolioPage(): JSX.Element {
               e.stopPropagation();
               openEdit(row);
             }}
-            className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+            className="rounded-lg p-1.5 text-fg-muted transition-colors hover:bg-surface-tint hover:text-fg"
             aria-label="Edit"
             title="Edit"
           >
@@ -178,7 +178,7 @@ export default function PortfolioPage(): JSX.Element {
               e.stopPropagation();
               setDeleteTarget(row);
             }}
-            className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-red-400"
+            className="rounded-lg p-1.5 text-fg-muted transition-colors hover:bg-surface-tint hover:text-red-400"
             aria-label="Delete"
             title="Delete"
           >
@@ -194,11 +194,11 @@ export default function PortfolioPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Student</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Student</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Portfolio
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Add and organize your portfolio entries.
         </p>
       </header>

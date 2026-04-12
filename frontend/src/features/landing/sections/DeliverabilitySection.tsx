@@ -19,10 +19,10 @@ export function DeliverabilitySection(): JSX.Element {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-70px' }}
             transition={{ duration: 0.55, delay: index * 0.04 }}
-            className="ef-card rounded-xl border border-white/15 bg-white/[0.015] p-5"
+            className="ef-card rounded-xl border border-border-strong bg-surface-faint p-5"
           >
-            <h3 className="text-base font-semibold text-white">{item.title}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-300">{item.body}</p>
+            <h3 className="text-base font-semibold text-fg">{item.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-fg-muted">{item.body}</p>
           </motion.article>
         ))}
       </div>

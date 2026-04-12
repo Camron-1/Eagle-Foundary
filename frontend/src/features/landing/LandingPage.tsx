@@ -29,9 +29,12 @@ export default function LandingPage(): JSX.Element {
   }, []);
 
   return (
-    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-white/10 blur-[220px]" />
+    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-surface-tint-strong blur-[220px]" />
       <div className="pointer-events-none absolute right-[-24rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-blue-500/20 blur-[180px]" />
 
       <div className="relative z-10">

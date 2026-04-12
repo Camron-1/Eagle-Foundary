@@ -24,10 +24,10 @@ function getSortIcon(col: Column<unknown>, sortKey?: string, sortDir?: 'asc' | '
   if (!col.sortable) return null;
   if (sortKey === col.key) {
     return sortDir === 'asc'
-      ? <ArrowUp size={12} className="text-zinc-300" />
-      : <ArrowDown size={12} className="text-zinc-300" />;
+      ? <ArrowUp size={12} className="text-fg-muted" />
+      : <ArrowDown size={12} className="text-fg-muted" />;
   }
-  return <ArrowUpDown size={12} className="text-zinc-600" />;
+  return <ArrowUpDown size={12} className="text-fg-subtle" />;
 }
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -41,9 +41,9 @@ export function DataTable<T extends Record<string, unknown>>({
   className,
 }: DataTableProps<T>): JSX.Element {
   return (
-    <div className={cn('overflow-x-auto rounded-2xl border border-white/10 bg-black/45', className)}>
+    <div className={cn('overflow-x-auto rounded-2xl border border-border-subtle bg-surface', className)}>
       <table className="w-full min-w-[560px] text-left text-sm">
-        <thead className="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+        <thead className="border-b border-border-subtle text-xs uppercase tracking-[0.12em] text-fg-muted">
           <tr>
             {columns.map((col) => (
               <th
@@ -75,7 +75,7 @@ export function DataTable<T extends Record<string, unknown>>({
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-10 text-center text-zinc-500">
+              <td colSpan={columns.length} className="px-4 py-10 text-center text-fg-subtle">
                 {emptyMessage}
               </td>
             </tr>
@@ -93,8 +93,8 @@ export function DataTable<T extends Record<string, unknown>>({
                 tabIndex={onRowClick ? 0 : undefined}
                 role={onRowClick ? 'button' : undefined}
                 className={cn(
-                  'border-b border-white/5 text-zinc-200 last:border-b-0 transition-colors',
-                  onRowClick && 'cursor-pointer hover:bg-white/[0.03] focus-visible:bg-white/[0.03] focus-visible:outline-none',
+                  'border-b border-border-subtle text-fg last:border-b-0 transition-colors',
+                  onRowClick && 'cursor-pointer hover:bg-surface-faint focus-visible:bg-surface-faint focus-visible:outline-none',
                 )}
               >
                 {columns.map((col) => (

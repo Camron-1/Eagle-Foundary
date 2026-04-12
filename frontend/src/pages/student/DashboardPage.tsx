@@ -66,11 +66,11 @@ export default function DashboardPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Student</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Student</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Dashboard
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Track your startups, join requests, applications, and notifications.
         </p>
       </header>
@@ -91,8 +91,8 @@ export default function DashboardPage(): JSX.Element {
       )}
 
       <Card>
-        <h2 className="text-lg font-semibold text-white">Quick links</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h2 className="text-lg font-semibold text-fg">Quick links</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           Jump to your startups, opportunities, or messages.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">

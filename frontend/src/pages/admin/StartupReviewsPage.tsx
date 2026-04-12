@@ -35,7 +35,7 @@ export default function StartupReviewsPage(): JSX.Element {
     {
       key: 'name',
       header: 'Startup',
-      render: (row) => <span className="font-medium text-zinc-200">{row.name}</span>,
+      render: (row) => <span className="font-medium text-fg">{row.name}</span>,
     },
     {
       key: 'founder',
@@ -44,7 +44,7 @@ export default function StartupReviewsPage(): JSX.Element {
         const founder = (row.members as PendingStartup['members'])?.find((m) => m.role === 'founder');
         const p = founder?.profile;
         const name = p ? `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim() : '—';
-        return <span className="text-zinc-400">{name || '—'}</span>;
+        return <span className="text-fg-muted">{name || '—'}</span>;
       },
     },
     {
@@ -52,7 +52,7 @@ export default function StartupReviewsPage(): JSX.Element {
       header: 'Submitted',
       render: (row) => {
         const d = row.createdAt ? new Date(row.createdAt as string) : null;
-        return <span className="text-zinc-400">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
+        return <span className="text-fg-muted">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
       },
     },
     {
@@ -78,11 +78,11 @@ export default function StartupReviewsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Admin</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Admin</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Pending Startup Reviews
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Review and approve or reject submitted startups.
         </p>
       </header>

@@ -4,7 +4,7 @@ import { useAuth } from '@/store/authStore';
 export default function ActiveUserGuard(): JSX.Element {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center bg-black" />;
+  if (isLoading) return <div className="flex h-screen items-center justify-center bg-page" />;
 
   if (!user) {
     return <Navigate to="/login" replace />;

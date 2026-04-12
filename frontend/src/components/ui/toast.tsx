@@ -46,7 +46,7 @@ function ToastItem({ item }: { item: ToastItem }): JSX.Element {
       role={item.type === 'info' ? 'status' : 'alert'}
       aria-live={item.type === 'info' ? 'polite' : 'assertive'}
       className={cn(
-        'flex items-start gap-3 rounded-xl border bg-zinc-950/95 px-4 py-3 shadow-lg backdrop-blur-lg',
+        'flex items-start gap-3 rounded-xl border bg-panel px-4 py-3 shadow-lg backdrop-blur-lg',
         colorMap[item.type],
       )}
       initial={{ opacity: 0, x: 24 }}
@@ -55,11 +55,11 @@ function ToastItem({ item }: { item: ToastItem }): JSX.Element {
       transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
     >
       <Icon size={18} className="mt-0.5 shrink-0" />
-      <p className="flex-1 text-sm text-zinc-200">{item.message}</p>
+      <p className="flex-1 text-sm text-fg">{item.message}</p>
       <button
         onClick={() => remove(item.id)}
         aria-label="Dismiss notification"
-        className="shrink-0 rounded p-0.5 text-zinc-500 hover:bg-white/5 hover:text-zinc-300 focus-visible:ring-2 focus-visible:ring-white/30"
+        className="shrink-0 rounded p-0.5 text-fg-subtle hover:bg-surface-tint hover:text-fg-muted focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X size={14} />
       </button>

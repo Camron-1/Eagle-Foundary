@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { AppLogo } from '@/components/brand/AppLogo';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { navItems } from '@/features/landing/data/content';
 import { SectionShell } from '@/features/landing/components/section-shell';
 
@@ -25,7 +27,7 @@ function HeroCube(): JSX.Element {
       <div className="hero-cube-reflection main" />
       <div className="hero-cube-reflection secondary" />
       <div className="hero-cube-reflection toward-copy" />
-      <div className="hero-rim absolute inset-0 m-auto h-56 w-56 rounded-[2.2rem] bg-white/5 blur-3xl md:h-72 md:w-72" />
+      <div className="hero-rim absolute inset-0 m-auto h-56 w-56 rounded-[2.2rem] blur-3xl md:h-72 md:w-72" />
       <div className="hero-cube-stage absolute inset-0 flex items-center justify-center">
         <div className="hero-cube">
           {faces.map((face) => (
@@ -48,18 +50,11 @@ export function HeroSection(): JSX.Element {
       <SectionShell className="pt-8 md:pt-10">
         <header className="mb-16 flex items-center justify-between gap-4">
           <Link to="/" className="inline-flex items-center gap-3">
-            <picture>
-              <source media="(prefers-color-scheme: light)" srcSet="/assets/brand/logo-light-512.png" />
-              <img
-                src="/assets/brand/logo-dark-512.png"
-                alt="Eagle-Foundry"
-                className="h-8 w-8 rounded-full object-cover"
-              />
-            </picture>
-            <span className="text-sm font-semibold tracking-wide text-zinc-100">Eagle-Foundry</span>
+            <AppLogo className="h-8 w-8 rounded-full object-cover" />
+            <span className="text-sm font-semibold tracking-wide text-fg">Eagle-Foundry</span>
           </Link>
 
-          <nav className="hidden items-center gap-7 text-xs text-zinc-300 md:flex">
+          <nav className="hidden items-center gap-7 text-xs text-fg-muted md:flex">
             {navItems.map((item) => (
               <Link
                 key={item}
@@ -67,7 +62,7 @@ export function HeroSection(): JSX.Element {
                   const slug = item.toLowerCase().replace(/\s+/g, '-');
                   return slug === 'contact' ? '/contact' : `/${slug}`;
                 })()}
-                className="transition-colors hover:text-white"
+                className="transition-colors hover:text-fg"
               >
                 {item}
               </Link>
@@ -75,6 +70,7 @@ export function HeroSection(): JSX.Element {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" className="hidden md:inline-flex" onClick={() => navigate('/login')}>
               Sign In
             </Button>
@@ -95,7 +91,7 @@ export function HeroSection(): JSX.Element {
             <h1 className="ef-heading-gradient max-w-xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
               The venture network where students and companies build together.
             </h1>
-            <p className="max-w-lg text-sm leading-relaxed text-zinc-300 md:text-base">
+            <p className="max-w-lg text-sm leading-relaxed text-fg-muted md:text-base">
               Students launch ideas, recruit co-founders, and raise support. Companies outsource strategic work, discover
               founder-ready talent, and invest early in high-conviction projects.
             </p>
@@ -103,7 +99,7 @@ export function HeroSection(): JSX.Element {
               <Button withBorderEffect={false} className="px-6 py-2.5" onClick={() => navigate('/sign-up')}>
                 Create a Project
               </Button>
-              <Link to="/sign-up" className="text-sm text-zinc-300 transition-colors hover:text-white">
+              <Link to="/sign-up" className="text-sm text-fg-muted transition-colors hover:text-fg">
                 Explore the platform
               </Link>
             </div>

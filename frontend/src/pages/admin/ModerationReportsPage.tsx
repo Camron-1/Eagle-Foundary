@@ -83,26 +83,26 @@ export default function ModerationReportsPage(): JSX.Element {
       key: 'id',
       header: 'Report ID',
       render: (row) => (
-        <span className="font-mono text-xs text-zinc-400">{truncate(row.id as string, 12)}</span>
+        <span className="font-mono text-xs text-fg-muted">{truncate(row.id as string, 12)}</span>
       ),
     },
     {
       key: 'targetType',
       header: 'Target Type',
-      render: (row) => <span className="text-zinc-300">{row.targetType}</span>,
+      render: (row) => <span className="text-fg-muted">{row.targetType}</span>,
     },
     {
       key: 'targetId',
       header: 'Target ID',
       render: (row) => (
-        <span className="font-mono text-xs text-zinc-500">{truncate(row.targetId as string, 12)}</span>
+        <span className="font-mono text-xs text-fg-subtle">{truncate(row.targetId as string, 12)}</span>
       ),
     },
     {
       key: 'reporterReason',
       header: 'Reporter Reason',
       render: (row) => (
-        <span className="text-zinc-400 max-w-[200px] truncate block" title={row.reporterReason as string}>
+        <span className="text-fg-muted max-w-[200px] truncate block" title={row.reporterReason as string}>
           {truncate((row.reporterReason as string) ?? '', TRUNCATE_LEN)}
         </span>
       ),
@@ -135,17 +135,17 @@ export default function ModerationReportsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Admin</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Admin</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Moderation Reports
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Review and resolve user-submitted reports.
         </p>
       </header>
 
       {isLoading ? (
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       ) : reports.length === 0 ? (
         <EmptyState
           title="No pending reports"
@@ -166,18 +166,18 @@ export default function ModerationReportsPage(): JSX.Element {
       >
         {selectedReport && (
           <div className="space-y-4">
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-fg-muted">
               Target: {selectedReport.targetType} — {truncate(selectedReport.targetId, 20)}
             </p>
-            <p className="text-sm text-zinc-300">{selectedReport.reporterReason}</p>
+            <p className="text-sm text-fg-muted">{selectedReport.reporterReason}</p>
             {selectedReport.evidenceText && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                <p className="mb-1 text-xs uppercase tracking-[0.12em] text-zinc-500">Reporter Evidence</p>
-                <p className="text-sm text-zinc-300">{selectedReport.evidenceText}</p>
+              <div className="rounded-xl border border-border-subtle bg-surface-tint p-3">
+                <p className="mb-1 text-xs uppercase tracking-[0.12em] text-fg-subtle">Reporter Evidence</p>
+                <p className="text-sm text-fg-muted">{selectedReport.evidenceText}</p>
               </div>
             )}
             {selectedReport.evidenceMessageId && (
-              <p className="font-mono text-xs text-zinc-500">
+              <p className="font-mono text-xs text-fg-subtle">
                 Evidence message: {selectedReport.evidenceMessageId}
               </p>
             )}

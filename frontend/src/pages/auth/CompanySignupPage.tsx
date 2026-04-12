@@ -147,9 +147,9 @@ export default function CompanySignupPage(): JSX.Element {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
       <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Create organization</h1>
-      <p className="mt-2 text-sm text-zinc-400">Post opportunities and discover student talent.</p>
+      <p className="mt-2 text-sm text-fg-muted">Post opportunities and discover student talent.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
         <Input label="Company name" {...register('companyName')} error={errors.companyName?.message} />
@@ -173,11 +173,11 @@ export default function CompanySignupPage(): JSX.Element {
           hint="Min 8 chars, uppercase, lowercase, number"
         />
 
-        <div className="space-y-2 rounded-xl border border-white/12 bg-black/45 p-3">
-          <p className="text-xs font-medium uppercase tracking-[0.12em] text-zinc-400">
+        <div className="space-y-2 rounded-xl border border-border-input bg-surface p-3">
+          <p className="text-xs font-medium uppercase tracking-[0.12em] text-fg-muted">
             Verification documents (PDF only)
           </p>
-          <p className="text-xs text-zinc-500">Upload 1-5 files, maximum 10MB each.</p>
+          <p className="text-xs text-fg-subtle">Upload 1-5 files, maximum 10MB each.</p>
 
           <input
             ref={fileInputRef}
@@ -185,19 +185,19 @@ export default function CompanySignupPage(): JSX.Element {
             accept="application/pdf"
             multiple
             onChange={handleFilesSelected}
-            className="block w-full text-xs text-zinc-300 file:mr-3 file:rounded-full file:border file:border-white/20 file:bg-white/5 file:px-3 file:py-1.5 file:text-xs file:text-zinc-200 hover:file:bg-white/10"
+            className="block w-full text-xs text-fg-muted file:mr-3 file:rounded-full file:border file:border-border-strong file:bg-surface-tint file:px-3 file:py-1.5 file:text-xs file:text-fg hover:file:bg-surface-tint-strong"
           />
 
           {documents.length > 0 && (
-            <ul className="space-y-1.5 text-xs text-zinc-300">
+            <ul className="space-y-1.5 text-xs text-fg-muted">
               {documents.map((doc, index) => (
-                <li key={`${doc.name}-${doc.lastModified}`} className="flex items-center justify-between gap-2 rounded bg-white/5 px-2 py-1.5">
+                <li key={`${doc.name}-${doc.lastModified}`} className="flex items-center justify-between gap-2 rounded bg-surface-tint px-2 py-1.5">
                   <span className="truncate">
                     {doc.name} ({Math.ceil(doc.size / 1024)} KB)
                   </span>
                   <button
                     type="button"
-                    className="text-zinc-400 underline underline-offset-2 hover:text-white"
+                    className="text-fg-muted underline underline-offset-2 hover:text-fg"
                     onClick={() => removeDocument(index)}
                   >
                     Remove
@@ -213,9 +213,9 @@ export default function CompanySignupPage(): JSX.Element {
         </Button>
       </form>
 
-      <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-400">
-        <Link to="/login" className="underline underline-offset-4 hover:text-white">Already have an account?</Link>
-        <Link to="/sign-up" className="underline underline-offset-4 hover:text-white">Choose a different role</Link>
+      <div className="mt-5 flex flex-wrap gap-4 text-sm text-fg-muted">
+        <Link to="/login" className="underline underline-offset-4 hover:text-fg">Already have an account?</Link>
+        <Link to="/sign-up" className="underline underline-offset-4 hover:text-fg">Choose a different role</Link>
       </div>
     </div>
   );

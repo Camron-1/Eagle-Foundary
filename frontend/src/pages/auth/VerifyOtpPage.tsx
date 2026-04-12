@@ -102,9 +102,9 @@ export default function VerifyOtpPage(): JSX.Element {
 
   return (
     <div className="text-center">
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Verification</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Verification</p>
       <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Verify your email</h1>
-      <p className="mt-2 text-sm text-zinc-400">Enter the 6-digit code sent to <span className="text-zinc-200">{email || 'your inbox'}</span></p>
+      <p className="mt-2 text-sm text-fg-muted">Enter the 6-digit code sent to <span className="text-fg">{email || 'your inbox'}</span></p>
 
       <div className="mx-auto mt-6 flex justify-center gap-2" onPaste={handlePaste}>
         {digits.map((digit, i) => (
@@ -119,7 +119,7 @@ export default function VerifyOtpPage(): JSX.Element {
             onKeyDown={(e) => handleKeyDown(i, e)}
             aria-label={`OTP digit ${i + 1}`}
             disabled={loading}
-            className="h-12 w-11 rounded-xl border border-white/12 bg-black/60 text-center text-lg font-semibold text-white transition-colors focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="h-12 w-11 rounded-xl border border-border-input bg-surface-input text-center text-lg font-semibold text-fg transition-colors focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-ring"
           />
         ))}
       </div>
@@ -132,9 +132,9 @@ export default function VerifyOtpPage(): JSX.Element {
         </Button>
       </div>
 
-      <div className="mt-5 flex flex-wrap justify-center gap-4 text-sm text-zinc-400">
-        <Link to="/sign-up" className="underline underline-offset-4 hover:text-white">Change email</Link>
-        <Link to="/login" className="underline underline-offset-4 hover:text-white">Back to login</Link>
+      <div className="mt-5 flex flex-wrap justify-center gap-4 text-sm text-fg-muted">
+        <Link to="/sign-up" className="underline underline-offset-4 hover:text-fg">Change email</Link>
+        <Link to="/login" className="underline underline-offset-4 hover:text-fg">Back to login</Link>
       </div>
     </div>
   );

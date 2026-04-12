@@ -28,14 +28,14 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         disabled={current <= 1}
         onClick={() => onPageChange(current - 1)}
         aria-label="Previous page"
-        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-30"
+        className="rounded-lg p-1.5 text-fg-muted transition-colors hover:bg-surface-tint hover:text-fg disabled:opacity-30"
       >
         <ChevronLeft size={16} />
       </button>
 
       {pages.map((p, i) =>
         p === 'ellipsis' ? (
-          <span key={`e${i}`} className="px-2 text-xs text-zinc-600">...</span>
+          <span key={`e${i}`} className="px-2 text-xs text-fg-subtle">...</span>
         ) : (
           <button
             key={p}
@@ -43,7 +43,7 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
             aria-current={current === p ? 'page' : undefined}
             className={cn(
               'h-8 min-w-[32px] rounded-lg px-2 text-xs font-medium transition-colors',
-              current === p ? 'bg-white/10 text-white' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200',
+              current === p ? 'bg-surface-tint-strong text-fg' : 'text-fg-muted hover:bg-surface-tint hover:text-fg',
             )}
           >
             {p}
@@ -55,7 +55,7 @@ export function Pagination({ page, totalPages, onPageChange, className }: Pagina
         disabled={current >= totalPages}
         onClick={() => onPageChange(current + 1)}
         aria-label="Next page"
-        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-30"
+        className="rounded-lg p-1.5 text-fg-muted transition-colors hover:bg-surface-tint hover:text-fg disabled:opacity-30"
       >
         <ChevronRight size={16} />
       </button>

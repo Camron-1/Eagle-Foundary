@@ -23,7 +23,7 @@ export default function OrganizationDetailPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <h1 className="ef-heading-gradient text-4xl font-semibold">Failed to load organization</h1>
-        <Link to="/organizations" className="text-sm text-zinc-400 underline hover:text-white">
+        <Link to="/organizations" className="text-sm text-fg-muted underline hover:text-fg">
           Back to discovery
         </Link>
       </div>
@@ -44,7 +44,7 @@ export default function OrganizationDetailPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <h1 className="ef-heading-gradient text-4xl font-semibold">Organization not found</h1>
-        <Link to="/organizations" className="text-sm text-zinc-400 underline hover:text-white">
+        <Link to="/organizations" className="text-sm text-fg-muted underline hover:text-fg">
           Back to discovery
         </Link>
       </div>
@@ -54,7 +54,7 @@ export default function OrganizationDetailPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           {org.name}
         </h1>
@@ -63,7 +63,7 @@ export default function OrganizationDetailPage(): JSX.Element {
             href={org.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-block text-zinc-400 underline underline-offset-2 hover:text-white"
+            className="mt-2 inline-block text-fg-muted underline underline-offset-2 hover:text-fg"
           >
             {org.website}
           </a>
@@ -78,7 +78,7 @@ export default function OrganizationDetailPage(): JSX.Element {
       </header>
 
       {org.description && (
-        <p className="text-sm text-zinc-400 whitespace-pre-wrap max-w-3xl">{org.description}</p>
+        <p className="text-sm text-fg-muted whitespace-pre-wrap max-w-3xl">{org.description}</p>
       )}
     </div>
   );

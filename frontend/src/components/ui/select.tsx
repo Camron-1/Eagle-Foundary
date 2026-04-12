@@ -20,7 +20,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.12em] text-zinc-400">
+          <label htmlFor={inputId} className="block text-xs font-medium uppercase tracking-[0.12em] text-fg-muted">
             {label}
           </label>
         )}
@@ -28,10 +28,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           id={inputId}
           ref={ref}
           className={cn(
-            'w-full appearance-none rounded-xl border bg-black/60 px-3.5 py-2.5 text-sm text-zinc-100 transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-1 focus:ring-offset-black',
+            'w-full appearance-none rounded-xl border bg-surface-input px-3.5 py-2.5 text-sm text-fg transition-colors',
+            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-page',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            error ? 'border-red-500/50' : 'border-white/12 hover:border-white/20',
+            error ? 'border-red-500/50' : 'border-border-input hover:border-border-strong',
             className,
           )}
           {...props}

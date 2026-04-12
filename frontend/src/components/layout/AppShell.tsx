@@ -26,9 +26,12 @@ export default function AppShell(): JSX.Element {
   }, [location.pathname]);
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.06]" />
-      <div className="pointer-events-none absolute left-[-18rem] top-[-20rem] h-[36rem] w-[36rem] rounded-full bg-white/10 blur-[180px]" />
+    <div className="relative flex h-screen flex-col overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute left-[-18rem] top-[-20rem] h-[36rem] w-[36rem] rounded-full bg-surface-tint-strong blur-[180px]" />
 
       <div className="relative z-10 flex h-full flex-col">
         <TopBar onToggleSidebar={toggleSidebar} />
@@ -53,7 +56,7 @@ export default function AppShell(): JSX.Element {
                 transition={reducedMotion ? { duration: 0 } : { duration: 0.2 }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-black/60"
+                  className="absolute inset-0 bg-overlay"
                   initial={reducedMotion ? undefined : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={reducedMotion ? undefined : { opacity: 0 }}

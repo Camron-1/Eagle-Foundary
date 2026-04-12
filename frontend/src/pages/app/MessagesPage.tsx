@@ -33,7 +33,7 @@ export default function MessagesPage(): JSX.Element {
       key: 'thread',
       header: 'Thread',
       render: (row) => (
-        <span className="font-medium text-zinc-200">{getThreadContext(row)}</span>
+        <span className="font-medium text-fg">{getThreadContext(row)}</span>
       ),
     },
     {
@@ -45,7 +45,7 @@ export default function MessagesPage(): JSX.Element {
           ? 'New encrypted message'
           : (last?.content ?? '—');
         const truncated = preview.length > 60 ? `${preview.slice(0, 60)}…` : preview;
-        return <span className="text-zinc-400">{truncated}</span>;
+        return <span className="text-fg-muted">{truncated}</span>;
       },
     },
     {
@@ -54,7 +54,7 @@ export default function MessagesPage(): JSX.Element {
       render: (row) => {
         const d = row.updatedAt ? new Date(row.updatedAt) : null;
         return (
-          <span className="text-zinc-500">
+          <span className="text-fg-subtle">
             {d && !isNaN(d.getTime()) ? formatDistanceToNow(d, { addSuffix: true }) : '—'}
           </span>
         );
@@ -64,7 +64,7 @@ export default function MessagesPage(): JSX.Element {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <span className="text-xs text-zinc-500">View</span>
+        <span className="text-xs text-fg-subtle">View</span>
       ),
     },
   ];

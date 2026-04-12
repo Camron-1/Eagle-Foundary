@@ -69,7 +69,7 @@ const discoveryNav: NavItem[] = [
 function NavGroup({ label, items }: { label: string; items: NavItem[] }): JSX.Element {
   return (
     <div className="mb-5">
-      <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">{label}</p>
+      <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-fg-subtle">{label}</p>
       <nav className="space-y-0.5">
         {items.map((item) => (
           <NavLink
@@ -80,8 +80,8 @@ function NavGroup({ label, items }: { label: string; items: NavItem[] }): JSX.El
               cn(
                 'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
                 isActive
-                  ? 'bg-white/10 text-white'
-                  : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200',
+                  ? 'bg-surface-tint-strong text-fg'
+                  : 'text-fg-muted hover:bg-surface-tint hover:text-fg',
               )
             }
           >
@@ -104,7 +104,7 @@ export function Sidebar({ collapsed }: SidebarProps): JSX.Element {
 
   return (
     <motion.aside
-      className="flex h-full shrink-0 flex-col overflow-hidden border-r border-white/10 bg-black/40 px-2 py-4 backdrop-blur-md"
+      className="flex h-full shrink-0 flex-col overflow-hidden border-r border-border-subtle bg-surface px-2 py-4 backdrop-blur-md"
       initial={false}
       animate={{ width: collapsed ? 0 : 224 }}
       transition={reducedMotion ? { duration: 0 } : { type: 'tween', duration: 0.25, ease: 'easeOut' }}
@@ -120,8 +120,8 @@ export function Sidebar({ collapsed }: SidebarProps): JSX.Element {
           <NavLink
             to="/reports"
             className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/5 hover:text-zinc-300 ${
-                isActive ? 'bg-white/5 text-white' : 'text-zinc-500'
+              `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-surface-tint hover:text-fg-muted ${
+                isActive ? 'bg-surface-tint text-fg' : 'text-fg-subtle'
               }`
             }
           >

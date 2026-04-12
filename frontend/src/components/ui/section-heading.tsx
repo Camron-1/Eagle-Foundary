@@ -12,7 +12,7 @@ export function SectionHeading({ title, description, centered, className }: Sect
     <div className={cn(centered && 'text-center', className)}>
       <h2 className="ef-heading-gradient text-3xl font-semibold leading-tight md:text-4xl">{title}</h2>
       {description ? (
-        <p className={cn('mt-4 max-w-2xl text-sm text-zinc-300 md:text-base', centered && 'mx-auto')}>{description}</p>
+        <p className={cn('mt-4 max-w-2xl text-sm text-fg-muted md:text-base', centered && 'mx-auto')}>{description}</p>
       ) : null}
     </div>
   );

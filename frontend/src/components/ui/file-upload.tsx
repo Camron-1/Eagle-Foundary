@@ -45,14 +45,14 @@ export function FileUpload({ accept, maxSizeMb = 10, onFile, label, currentFile,
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      {label && <p className="text-xs font-medium uppercase tracking-[0.12em] text-zinc-400">{label}</p>}
+      {label && <p className="text-xs font-medium uppercase tracking-[0.12em] text-fg-muted">{label}</p>}
 
       {currentFile ? (
-        <div className="flex items-center gap-3 rounded-xl border border-white/12 bg-black/60 px-3.5 py-2.5">
-          <FileText size={16} className="text-zinc-400" />
-          <span className="flex-1 truncate text-sm text-zinc-200">{currentFile}</span>
+        <div className="flex items-center gap-3 rounded-xl border border-border-input bg-surface-input px-3.5 py-2.5">
+          <FileText size={16} className="text-fg-muted" />
+          <span className="flex-1 truncate text-sm text-fg">{currentFile}</span>
           {onClear && (
-            <button onClick={onClear} className="text-zinc-500 hover:text-zinc-300">
+            <button onClick={onClear} className="text-fg-subtle hover:text-fg-muted">
               <X size={14} />
             </button>
           )}
@@ -65,11 +65,11 @@ export function FileUpload({ accept, maxSizeMb = 10, onFile, label, currentFile,
           onClick={() => inputRef.current?.click()}
           className={cn(
             'flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center transition-colors',
-            dragOver ? 'border-white/30 bg-white/5' : 'border-white/12 bg-black/40 hover:border-white/20',
+            dragOver ? 'border-border-strong bg-surface-tint' : 'border-border-input bg-surface hover:border-border-strong',
           )}
         >
-          <Upload size={20} className="text-zinc-500" />
-          <p className="text-xs text-zinc-400">Drop file here or click to browse</p>
+          <Upload size={20} className="text-fg-subtle" />
+          <p className="text-xs text-fg-muted">Drop file here or click to browse</p>
           <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={(e) => { if (e.target.files?.[0]) { handleFile(e.target.files[0]); e.target.value = ''; } }} />
         </div>
       )}

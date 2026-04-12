@@ -19,7 +19,7 @@ export function CodeApiSection(): JSX.Element {
   return (
     <SectionShell>
       <div className="mx-auto max-w-3xl text-center">
-        <div className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/[0.03]">
+        <div className="mx-auto mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-border-strong bg-surface-faint">
           <TerminalSquare size={20} />
         </div>
         <SectionHeading
@@ -34,15 +34,15 @@ export function CodeApiSection(): JSX.Element {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: 0.7 }}
-        className="ef-card mt-10 rounded-2xl border border-white/15 bg-zinc-950"
+        className="ef-card mt-10 rounded-2xl border border-border-strong bg-panel"
       >
-        <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3 text-xs text-zinc-400">
+        <div className="flex items-center gap-2 border-b border-border-subtle px-5 py-3 text-xs text-fg-muted">
           <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
           <span className="ml-3">eagle-foundry.ts</span>
         </div>
-        <pre className="overflow-x-auto p-5 text-xs leading-6 text-zinc-200 md:text-sm">
+        <pre className="overflow-x-auto p-5 text-xs leading-6 text-fg md:text-sm">
           <code>{codeSnippet}</code>
         </pre>
       </motion.div>

@@ -36,11 +36,11 @@ export default function AdminDashboardPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Admin</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Admin</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Admin Dashboard
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Overview of platform activity, pending reviews, and moderation.
         </p>
       </header>

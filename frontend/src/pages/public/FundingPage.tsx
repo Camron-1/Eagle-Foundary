@@ -31,7 +31,7 @@ const fundingTypes = [
     range: '€50K – €500K',
     description: 'High-conviction startups get featured in our quarterly investor digest, read by 200+ angels and early-stage VCs across Europe.',
     badge: 'Equity',
-    badgeColor: 'border-zinc-500/30 bg-zinc-500/10 text-zinc-300',
+    badgeColor: 'border-border-subtle bg-surface-tint text-fg-muted',
   },
 ];
 
@@ -54,9 +54,12 @@ export default function FundingPage(): JSX.Element {
   const navigate = useNavigate();
 
   return (
-    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-white/10 blur-[220px]" />
+    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-surface-tint-strong blur-[220px]" />
       <div className="pointer-events-none absolute right-[-20rem] top-[40rem] h-[35rem] w-[35rem] rounded-full bg-blue-500/15 blur-[180px]" />
 
       <div className="relative z-10">
@@ -70,13 +73,13 @@ export default function FundingPage(): JSX.Element {
             transition={{ duration: 0.8 }}
             className="mx-auto max-w-2xl"
           >
-            <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-zinc-300">
+            <span className="mb-6 inline-block rounded-full border border-border-subtle bg-surface-tint px-4 py-1.5 text-xs text-fg-muted">
               Funding
             </span>
             <h1 className="ef-heading-gradient mb-5 text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
               Capital for student ventures.
             </h1>
-            <p className="mb-8 text-sm leading-relaxed text-zinc-400 md:text-base">
+            <p className="mb-8 text-sm leading-relaxed text-fg-muted md:text-base">
               Eagle-Foundry connects student startups to grants, accelerators, and investors —
               structured around the academic journey, not despite it.
             </p>
@@ -96,7 +99,7 @@ export default function FundingPage(): JSX.Element {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="glass-card grid grid-cols-2 divide-y divide-white/10 rounded-2xl md:grid-cols-4 md:divide-x md:divide-y-0"
+            className="glass-card grid grid-cols-2 divide-y divide-border-subtle rounded-2xl md:grid-cols-4 md:divide-x md:divide-y-0"
           >
             {[
               { value: '€4.2M', label: 'Total raised' },
@@ -105,8 +108,8 @@ export default function FundingPage(): JSX.Element {
               { value: '3 mo', label: 'Avg. time to first check' },
             ].map((stat) => (
               <div key={stat.label} className="px-8 py-7 text-center">
-                <div className="mb-1 text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs text-zinc-400">{stat.label}</div>
+                <div className="mb-1 text-2xl font-bold text-fg">{stat.value}</div>
+                <div className="text-xs text-fg-muted">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -124,7 +127,7 @@ export default function FundingPage(): JSX.Element {
             className="mb-12"
           >
             <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold tracking-tight">Funding pathways</h2>
-            <p className="max-w-lg text-sm text-zinc-400">Three routes to capital, each designed for a different stage and risk tolerance.</p>
+            <p className="max-w-lg text-sm text-fg-muted">Three routes to capital, each designed for a different stage and risk tolerance.</p>
           </motion.div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -138,16 +141,16 @@ export default function FundingPage(): JSX.Element {
                 className="ef-card glass-card flex flex-col rounded-2xl p-7"
               >
                 <div className="mb-5 flex items-start justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                    <type.icon size={20} className="text-zinc-300" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                    <type.icon size={20} className="text-fg-muted" />
                   </div>
                   <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${type.badgeColor}`}>
                     {type.badge}
                   </span>
                 </div>
-                <h3 className="mb-1 text-base font-semibold text-zinc-100">{type.name}</h3>
-                <div className="mb-3 text-xl font-bold text-white">{type.range}</div>
-                <p className="text-xs leading-relaxed text-zinc-400">{type.description}</p>
+                <h3 className="mb-1 text-base font-semibold text-fg">{type.name}</h3>
+                <div className="mb-3 text-xl font-bold text-fg">{type.range}</div>
+                <p className="text-xs leading-relaxed text-fg-muted">{type.description}</p>
               </motion.div>
             ))}
           </div>
@@ -165,7 +168,7 @@ export default function FundingPage(): JSX.Element {
               transition={{ duration: 0.7 }}
             >
               <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold tracking-tight">How to get funded</h2>
-              <p className="mb-8 text-sm text-zinc-400">Three steps from profile to first check.</p>
+              <p className="mb-8 text-sm text-fg-muted">Three steps from profile to first check.</p>
               <div className="space-y-6">
                 {process.map((item, i) => (
                   <motion.div
@@ -176,13 +179,13 @@ export default function FundingPage(): JSX.Element {
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className="flex gap-5"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                      <item.icon size={16} className="text-zinc-300" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                      <item.icon size={16} className="text-fg-muted" />
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[10px] font-medium text-zinc-500">{item.step}</div>
-                      <div className="mb-1 text-sm font-semibold text-zinc-100">{item.title}</div>
-                      <p className="text-xs leading-relaxed text-zinc-400">{item.description}</p>
+                      <div className="mb-0.5 text-[10px] font-medium text-fg-subtle">{item.step}</div>
+                      <div className="mb-1 text-sm font-semibold text-fg">{item.title}</div>
+                      <p className="text-xs leading-relaxed text-fg-muted">{item.description}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -197,11 +200,11 @@ export default function FundingPage(): JSX.Element {
               transition={{ duration: 0.7, delay: 0.15 }}
               className="ef-card glass-card rounded-2xl p-8"
             >
-              <h3 className="mb-6 text-base font-semibold text-zinc-100">Eligibility criteria</h3>
+              <h3 className="mb-6 text-base font-semibold text-fg">Eligibility criteria</h3>
               <ul className="space-y-4">
                 {eligibility.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-xs leading-relaxed text-zinc-400">
-                    <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-zinc-500" />
+                  <li key={item} className="flex items-start gap-3 text-xs leading-relaxed text-fg-muted">
+                    <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-fg-subtle" />
                     {item}
                   </li>
                 ))}
@@ -225,7 +228,7 @@ export default function FundingPage(): JSX.Element {
             className="glass-card mx-auto max-w-xl rounded-3xl p-10"
           >
             <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold">Ready to raise?</h2>
-            <p className="mb-8 text-sm text-zinc-400">Create your profile and get matched with the right funding pathway.</p>
+            <p className="mb-8 text-sm text-fg-muted">Create your profile and get matched with the right funding pathway.</p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button withBorderEffect={false} className="gap-2 px-6" onClick={() => navigate('/sign-up')}>
                 Apply now <ArrowRight size={14} />

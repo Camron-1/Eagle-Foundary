@@ -22,10 +22,10 @@ export function ExpectationsSection(): JSX.Element {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.55, delay: 0.06 * index }}
-            className="ef-card rounded-xl border border-white/15 bg-white/[0.02] p-5"
+            className="ef-card rounded-xl border border-border-strong bg-surface-faint p-5"
           >
-            <p className="text-sm leading-relaxed text-zinc-200">{testimonial.quote}</p>
-            <p className="mt-4 text-xs uppercase tracking-[0.12em] text-zinc-400">{testimonial.by}</p>
+            <p className="text-sm leading-relaxed text-fg">{testimonial.quote}</p>
+            <p className="mt-4 text-xs uppercase tracking-[0.12em] text-fg-muted">{testimonial.by}</p>
           </motion.article>
         ))}
       </div>

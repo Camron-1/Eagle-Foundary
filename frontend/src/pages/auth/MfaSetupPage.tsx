@@ -151,15 +151,15 @@ export default function MfaSetupPage(): JSX.Element {
   if (backupCodes.length > 0) {
     return (
       <div className="space-y-6">
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Account Security</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Account Security</p>
         <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Save your backup codes</h1>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-fg-muted">
           Store these one-time backup codes in a safe place. Each code can only be used once.
         </p>
 
-        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-black/50 p-4 text-sm text-zinc-200">
+        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-border-subtle bg-surface p-4 text-sm text-fg">
           {backupCodes.map((backupCode) => (
-            <code key={backupCode} className="rounded bg-white/5 px-2 py-1">{backupCode}</code>
+            <code key={backupCode} className="rounded bg-surface-tint px-2 py-1">{backupCode}</code>
           ))}
         </div>
 
@@ -176,36 +176,36 @@ export default function MfaSetupPage(): JSX.Element {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Account Security</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Account Security</p>
       <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Set up two-factor authentication</h1>
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className="mt-2 text-sm text-fg-muted">
         Add Eagle-Foundry to your authenticator app and enter the 6-digit code to finish sign-in.
       </p>
 
       {loadingSetup ? (
-        <div className="mt-6 h-24 animate-pulse rounded-xl bg-white/5" />
+        <div className="mt-6 h-24 animate-pulse rounded-xl bg-surface-tint" />
       ) : setupError ? (
         <p className="mt-6 text-sm text-red-400">{setupError}</p>
       ) : (
         <>
-          <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-black/55 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Scan QR code</p>
+          <div className="mt-6 space-y-3 rounded-2xl border border-border-subtle bg-surface p-4">
+            <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">Scan QR code</p>
             {qrCodeDataUrl ? (
               <div className="rounded-xl bg-white p-3">
                 <img src={qrCodeDataUrl} alt="MFA setup QR code" className="mx-auto h-56 w-56" />
               </div>
             ) : (
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-fg-muted">
                 {qrCodeError || 'Generating QR code...'}
               </p>
             )}
-            <p className="text-xs uppercase tracking-[0.14em] text-zinc-500">Manual setup key</p>
-            <code className="block break-all rounded bg-white/5 px-3 py-2 text-sm text-zinc-100">{secret}</code>
-            <p className="text-xs text-zinc-500">If QR import is unavailable, enter this key manually in your authenticator app.</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-fg-subtle">Manual setup key</p>
+            <code className="block break-all rounded bg-surface-tint px-3 py-2 text-sm text-fg">{secret}</code>
+            <p className="text-xs text-fg-subtle">If QR import is unavailable, enter this key manually in your authenticator app.</p>
             {otpauthUrl && (
               <a
                 href={otpauthUrl}
-                className="text-xs text-zinc-300 underline underline-offset-4 hover:text-white"
+                className="text-xs text-fg-muted underline underline-offset-4 hover:text-fg"
               >
                 Open authenticator link
               </a>
@@ -230,8 +230,8 @@ export default function MfaSetupPage(): JSX.Element {
         </>
       )}
 
-      <div className="mt-5 text-sm text-zinc-400">
-        <Link to="/login" className="underline underline-offset-4 hover:text-white">Back to login</Link>
+      <div className="mt-5 text-sm text-fg-muted">
+        <Link to="/login" className="underline underline-offset-4 hover:text-fg">Back to login</Link>
       </div>
     </div>
   );

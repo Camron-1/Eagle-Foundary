@@ -59,7 +59,7 @@ export default function MyJoinRequestsPage(): JSX.Element {
         return startupId ? (
           <button
             type="button"
-            className="text-zinc-300 underline underline-offset-2 hover:text-white"
+            className="text-fg-muted underline underline-offset-2 hover:text-fg"
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/startups/${startupId}`);
@@ -68,7 +68,7 @@ export default function MyJoinRequestsPage(): JSX.Element {
             {name}
           </button>
         ) : (
-          <span className="text-zinc-300">{name}</span>
+          <span className="text-fg-muted">{name}</span>
         );
       },
     },
@@ -76,7 +76,7 @@ export default function MyJoinRequestsPage(): JSX.Element {
       key: 'message',
       header: 'Message',
       render: (row) => (
-        <span className="max-w-[200px] truncate text-zinc-400" title={row.message ?? undefined}>
+        <span className="max-w-[200px] truncate text-fg-muted" title={row.message ?? undefined}>
           {truncate(row.message, 50)}
         </span>
       ),
@@ -91,7 +91,7 @@ export default function MyJoinRequestsPage(): JSX.Element {
       header: 'Updated',
       render: (row) => {
         const d = row.updatedAt ? new Date(row.updatedAt) : null;
-        return <span className="text-zinc-400">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
+        return <span className="text-fg-muted">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
       },
     },
     {
@@ -111,7 +111,7 @@ export default function MyJoinRequestsPage(): JSX.Element {
             Cancel
           </Button>
         ) : (
-          <span className="text-zinc-500">—</span>
+          <span className="text-fg-subtle">—</span>
         ),
     },
   ];
@@ -121,11 +121,11 @@ export default function MyJoinRequestsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Student</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Student</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           My Join Requests
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Track your requests to join startups.
         </p>
       </header>

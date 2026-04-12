@@ -220,7 +220,7 @@ export default function ProjectEditorPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Edit Project</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -245,11 +245,11 @@ export default function ProjectEditorPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           {isNew ? 'New Project' : 'Edit Project'}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           {isNew ? 'Create a new outsourced project for students.' : 'Update project details.'}
         </p>
       </header>
@@ -295,22 +295,22 @@ export default function ProjectEditorPage(): JSX.Element {
             error={errors.tagsStr?.message}
           />
 
-          <div className="space-y-4 border-t border-white/10 pt-6">
-            <h3 className="text-lg font-semibold text-zinc-200">Submission Form</h3>
-            <p className="text-sm text-zinc-400">
+          <div className="space-y-4 border-t border-border-subtle pt-6">
+            <h3 className="text-lg font-semibold text-fg">Submission Form</h3>
+            <p className="text-sm text-fg-muted">
               Students will provide name, address, resume URL, and cover letter by default. Add custom questions below if needed.
             </p>
 
             {customQuestions.map((q) => (
-              <div key={q.id} className="flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 p-3">
+              <div key={q.id} className="flex items-start gap-2 rounded-lg border border-border-subtle bg-surface-tint p-3">
                 <div className="flex-1">
-                  <p className="text-sm text-zinc-300">{q.question}</p>
+                  <p className="text-sm text-fg-muted">{q.question}</p>
                   {q.required && <span className="text-xs text-amber-400">Required</span>}
                 </div>
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.id)}
-                  className="text-zinc-500 transition-colors hover:text-red-400"
+                  className="text-fg-subtle transition-colors hover:text-red-400"
                   aria-label="Delete question"
                 >
                   <Trash2 size={16} />
@@ -330,12 +330,12 @@ export default function ProjectEditorPage(): JSX.Element {
                   }
                 }}
               />
-              <label className="flex items-center gap-1.5 whitespace-nowrap text-xs text-zinc-400">
+              <label className="flex items-center gap-1.5 whitespace-nowrap text-xs text-fg-muted">
                 <input
                   type="checkbox"
                   checked={newQuestionRequired}
                   onChange={(e) => setNewQuestionRequired(e.target.checked)}
-                  className="h-3.5 w-3.5 rounded border-zinc-600 bg-zinc-900 text-indigo-500"
+                  className="h-3.5 w-3.5 rounded border-border-input bg-surface-input text-indigo-500"
                 />
                 Required
               </label>

@@ -11,7 +11,7 @@ const dashboardByRole: Record<string, string> = {
 export default function GuestGuard(): JSX.Element {
   const { isAuthenticated, isLoading, user } = useAuth();
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center bg-black" />;
+  if (isLoading) return <div className="flex h-screen items-center justify-center bg-page" />;
 
   if (isAuthenticated && user) {
     if (user.status === 'PENDING_ORG_VERIFICATION' || user.status === 'PENDING_ORG_APPROVAL') {

@@ -25,7 +25,7 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps): JSX.
       <img
         src={src}
         alt={name ?? 'Avatar'}
-        className={cn('shrink-0 rounded-full border border-white/10 object-cover', sizeMap[size], className)}
+        className={cn('shrink-0 rounded-full border border-border-subtle object-cover', sizeMap[size], className)}
       />
     );
   }
@@ -33,7 +33,7 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps): JSX.
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full bg-white/10 font-semibold text-white',
+        'flex shrink-0 items-center justify-center rounded-full bg-surface-tint-strong font-semibold text-fg',
         sizeMap[size],
         className,
       )}

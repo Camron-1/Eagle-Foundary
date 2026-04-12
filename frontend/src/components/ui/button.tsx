@@ -10,14 +10,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'ef-button-primary text-black',
-  ghost: 'ef-button-ghost text-white',
-  outline: 'ef-button-outline text-white',
+  primary: 'ef-button-primary text-fg-inverse',
+  ghost: 'ef-button-ghost text-fg',
+  outline: 'ef-button-outline text-fg',
 };
 
 const buttonClasses = (variant: ButtonVariant, withBorderEffect: boolean) =>
   cn(
-    'ef-button inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60',
+    'ef-button inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring-strong focus-visible:ring-offset-2 focus-visible:ring-offset-page disabled:cursor-not-allowed disabled:opacity-60',
     variantClasses[variant],
     withBorderEffect ? 'with-border-effect' : 'no-border-effect'
   );

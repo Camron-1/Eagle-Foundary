@@ -73,9 +73,12 @@ export default function ForCompaniesPage(): JSX.Element {
   const navigate = useNavigate();
 
   return (
-    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-white/10 blur-[220px]" />
+    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-surface-tint-strong blur-[220px]" />
       <div className="pointer-events-none absolute right-[-24rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-blue-500/20 blur-[180px]" />
 
       <div className="relative z-10">
@@ -89,13 +92,13 @@ export default function ForCompaniesPage(): JSX.Element {
             transition={{ duration: 0.8 }}
             className="mx-auto max-w-2xl"
           >
-            <span className="mb-6 inline-block rounded-full border border-zinc-500/30 bg-zinc-500/10 px-4 py-1.5 text-xs text-zinc-300">
+            <span className="mb-6 inline-block rounded-full border border-border-subtle bg-surface-tint px-4 py-1.5 text-xs text-fg-muted">
               For Companies
             </span>
             <h1 className="ef-heading-gradient mb-5 text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
               The pipeline you've been missing.
             </h1>
-            <p className="mb-8 text-sm leading-relaxed text-zinc-400 md:text-base">
+            <p className="mb-8 text-sm leading-relaxed text-fg-muted md:text-base">
               Eagle-Foundry connects your company to the best student talent and earliest-stage ventures —
               before they hit the open market.
             </p>
@@ -120,7 +123,7 @@ export default function ForCompaniesPage(): JSX.Element {
             className="mb-12"
           >
             <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold tracking-tight">What companies do on Eagle-Foundry</h2>
-            <p className="max-w-lg text-sm text-zinc-400">Whether you're hiring, outsourcing, or investing — the platform adapts to your goals.</p>
+            <p className="max-w-lg text-sm text-fg-muted">Whether you're hiring, outsourcing, or investing — the platform adapts to your goals.</p>
           </motion.div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,11 +136,11 @@ export default function ForCompaniesPage(): JSX.Element {
                 transition={{ duration: 0.6, delay: i * 0.07 }}
                 className="ef-card glass-card rounded-2xl p-6"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                  <item.icon size={18} className="text-zinc-300" />
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                  <item.icon size={18} className="text-fg-muted" />
                 </div>
-                <h3 className="mb-2 text-sm font-semibold text-zinc-100">{item.title}</h3>
-                <p className="text-xs leading-relaxed text-zinc-400">{item.description}</p>
+                <h3 className="mb-2 text-sm font-semibold text-fg">{item.title}</h3>
+                <p className="text-xs leading-relaxed text-fg-muted">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -155,7 +158,7 @@ export default function ForCompaniesPage(): JSX.Element {
             className="mb-12 text-center"
           >
             <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold tracking-tight">Simple, transparent pricing</h2>
-            <p className="text-sm text-zinc-400">Start for free. Scale as you grow.</p>
+            <p className="text-sm text-fg-muted">Start for free. Scale as you grow.</p>
           </motion.div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -166,20 +169,20 @@ export default function ForCompaniesPage(): JSX.Element {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className={`ef-card rounded-2xl p-7 ${tier.highlight ? 'glass-card border border-white/20' : 'glass-card'}`}
+                className={`ef-card rounded-2xl p-7 ${tier.highlight ? 'glass-card border border-border-strong' : 'glass-card'}`}
               >
                 {tier.highlight && (
-                  <div className="mb-4 inline-block rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-[10px] font-medium text-zinc-200">
+                  <div className="mb-4 inline-block rounded-full border border-border-strong bg-surface-tint-strong px-3 py-0.5 text-[10px] font-medium text-fg">
                     Most popular
                   </div>
                 )}
-                <div className="mb-1 text-sm font-semibold text-zinc-200">{tier.name}</div>
-                <div className="mb-2 text-3xl font-bold text-white">{tier.price}</div>
-                <p className="mb-6 text-xs text-zinc-400">{tier.description}</p>
+                <div className="mb-1 text-sm font-semibold text-fg">{tier.name}</div>
+                <div className="mb-2 text-3xl font-bold text-fg">{tier.price}</div>
+                <p className="mb-6 text-xs text-fg-muted">{tier.description}</p>
                 <ul className="mb-8 space-y-2">
                   {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-zinc-300">
-                      <span className="h-1 w-1 rounded-full bg-zinc-400" />
+                    <li key={f} className="flex items-center gap-2 text-xs text-fg-muted">
+                      <span className="h-1 w-1 rounded-full bg-fg-muted" />
                       {f}
                     </li>
                   ))}
@@ -206,7 +209,7 @@ export default function ForCompaniesPage(): JSX.Element {
             transition={{ duration: 0.7 }}
           >
             <h2 className="ef-heading-gradient mb-4 text-4xl font-semibold">Ready to find your next hire?</h2>
-            <p className="mb-8 text-sm text-zinc-400">Join 120+ companies already using Eagle-Foundry.</p>
+            <p className="mb-8 text-sm text-fg-muted">Join 120+ companies already using Eagle-Foundry.</p>
             <Button withBorderEffect={false} className="gap-2 px-8" onClick={() => navigate('/sign-up/company')}>
               Register your company <ArrowRight size={14} />
             </Button>

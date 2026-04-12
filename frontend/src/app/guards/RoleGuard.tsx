@@ -9,7 +9,7 @@ interface Props {
 export default function RoleGuard({ allowed }: Props): JSX.Element {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center bg-black" />;
+  if (isLoading) return <div className="flex h-screen items-center justify-center bg-page" />;
 
   if (!user || !allowed.includes(user.role)) {
     return <Navigate to="/unauthorized" replace />;

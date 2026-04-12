@@ -129,7 +129,7 @@ export default function ProjectDetailPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <h1 className="ef-heading-gradient text-4xl font-semibold">Project not found</h1>
-        <Link to="/projects" className="text-sm text-zinc-400 underline hover:text-white">
+        <Link to="/projects" className="text-sm text-fg-muted underline hover:text-fg">
           Back to projects
         </Link>
       </div>
@@ -139,11 +139,11 @@ export default function ProjectDetailPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">{project.title}</h1>
         {project.org && (
-          <p className="mt-2 text-lg text-zinc-300">
-            <Link to={`/organizations/${project.org.id}`} className="text-zinc-300 underline underline-offset-2 hover:text-white">
+          <p className="mt-2 text-lg text-fg-muted">
+            <Link to={`/organizations/${project.org.id}`} className="text-fg-muted underline underline-offset-2 hover:text-fg">
               {project.org.name}
             </Link>
           </p>
@@ -160,16 +160,16 @@ export default function ProjectDetailPage(): JSX.Element {
 
       {activeTab === 'Overview' && (
         <div className="space-y-4">
-          {project.description && <p className="whitespace-pre-wrap text-sm text-zinc-400">{project.description}</p>}
+          {project.description && <p className="whitespace-pre-wrap text-sm text-fg-muted">{project.description}</p>}
         </div>
       )}
 
       {activeTab === 'Requirements' && (
         <div className="space-y-4">
           {project.requirements ? (
-            <p className="whitespace-pre-wrap text-sm text-zinc-400">{project.requirements}</p>
+            <p className="whitespace-pre-wrap text-sm text-fg-muted">{project.requirements}</p>
           ) : (
-            <p className="text-sm text-zinc-500">No requirements specified.</p>
+            <p className="text-sm text-fg-subtle">No requirements specified.</p>
           )}
         </div>
       )}
@@ -179,12 +179,12 @@ export default function ProjectDetailPage(): JSX.Element {
           {alreadySubmitted ? (
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
               <p className="text-sm font-medium text-emerald-400">✓ You have already submitted for this project</p>
-              <p className="mt-1 text-xs text-zinc-400">Check your applications page to track submission status.</p>
+              <p className="mt-1 text-xs text-fg-muted">Check your applications page to track submission status.</p>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="space-y-4">
-                <p className="text-xs uppercase tracking-wide text-zinc-500">Required Information</p>
+                <p className="text-xs uppercase tracking-wide text-fg-subtle">Required Information</p>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input label="First Name" placeholder="Your first name" value={formFirstName} onChange={(e) => setFormFirstName(e.target.value)} />
                   <Input label="Last Name" placeholder="Your last name" value={formLastName} onChange={(e) => setFormLastName(e.target.value)} />
@@ -207,8 +207,8 @@ export default function ProjectDetailPage(): JSX.Element {
               </div>
 
               {customQuestions.length > 0 && (
-                <div className="space-y-4 border-t border-white/10 pt-6">
-                  <p className="text-xs uppercase tracking-wide text-zinc-500">Questions from the Organization</p>
+                <div className="space-y-4 border-t border-border-subtle pt-6">
+                  <p className="text-xs uppercase tracking-wide text-fg-subtle">Questions from the Organization</p>
                   {customQuestions.map((q) => (
                     <Textarea
                       key={q.id}

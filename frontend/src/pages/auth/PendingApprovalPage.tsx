@@ -38,7 +38,7 @@ export default function PendingApprovalPage(): JSX.Element {
   return (
     <div className="mx-auto w-full max-w-2xl space-y-5 px-4 py-10">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Account Status</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Account Status</p>
         <h1 className="ef-heading-gradient mt-2 text-3xl font-semibold md:text-4xl">
           Access Pending
         </h1>
@@ -50,22 +50,22 @@ export default function PendingApprovalPage(): JSX.Element {
           <CardDescription>{description}</CardDescription>
         </CardHeader>
 
-        <div className="space-y-3 text-sm text-zinc-300">
+        <div className="space-y-3 text-sm text-fg-muted">
           <p>
-            <span className="text-zinc-500">Organization:</span>{' '}
+            <span className="text-fg-subtle">Organization:</span>{' '}
             {user.pendingContext?.orgName ?? user.org?.name ?? 'Not available'}
           </p>
 
           {user.pendingContext?.reviewNotes && (
             <p>
-              <span className="text-zinc-500">Review notes:</span>{' '}
+              <span className="text-fg-subtle">Review notes:</span>{' '}
               {user.pendingContext.reviewNotes}
             </p>
           )}
 
           {user.pendingContext?.joinRequestNote && (
             <p>
-              <span className="text-zinc-500">Admin note:</span>{' '}
+              <span className="text-fg-subtle">Admin note:</span>{' '}
               {user.pendingContext.joinRequestNote}
             </p>
           )}

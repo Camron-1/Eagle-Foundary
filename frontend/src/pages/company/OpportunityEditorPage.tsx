@@ -230,7 +230,7 @@ export default function OpportunityEditorPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Edit Opportunity</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -238,11 +238,11 @@ export default function OpportunityEditorPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           {isNew ? 'New Opportunity' : 'Edit Opportunity'}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           {isNew ? 'Create a new opportunity for students.' : 'Update opportunity details.'}
         </p>
       </header>
@@ -292,9 +292,9 @@ export default function OpportunityEditorPage(): JSX.Element {
           />
 
           {/* Application Form Settings */}
-          <div className="border-t border-white/10 pt-6 space-y-4">
-            <h3 className="text-lg font-semibold text-zinc-200">Application Form</h3>
-            <p className="text-sm text-zinc-400">
+          <div className="border-t border-border-subtle pt-6 space-y-4">
+            <h3 className="text-lg font-semibold text-fg">Application Form</h3>
+            <p className="text-sm text-fg-muted">
               Applicants will be asked for their name, address, resume URL, and a cover letter by default.
               Add custom questions below if you need specific information.
             </p>
@@ -302,10 +302,10 @@ export default function OpportunityEditorPage(): JSX.Element {
             {customQuestions.map((q) => (
               <div
                 key={q.id}
-                className="flex items-start gap-2 rounded-lg border border-white/10 bg-white/5 p-3"
+                className="flex items-start gap-2 rounded-lg border border-border-subtle bg-surface-tint p-3"
               >
                 <div className="flex-1">
-                  <p className="text-sm text-zinc-300">{q.question}</p>
+                  <p className="text-sm text-fg-muted">{q.question}</p>
                   {q.required && (
                     <span className="text-xs text-amber-400">Required</span>
                   )}
@@ -313,7 +313,7 @@ export default function OpportunityEditorPage(): JSX.Element {
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.id)}
-                  className="text-zinc-500 hover:text-red-400 transition-colors"
+                  className="text-fg-subtle hover:text-red-400 transition-colors"
                   aria-label="Delete question"
                 >
                   <Trash2 size={16} />
@@ -333,12 +333,12 @@ export default function OpportunityEditorPage(): JSX.Element {
                   }
                 }}
               />
-              <label className="flex items-center gap-1.5 text-xs text-zinc-400 whitespace-nowrap">
+              <label className="flex items-center gap-1.5 text-xs text-fg-muted whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={newQuestionRequired}
                   onChange={(e) => setNewQuestionRequired(e.target.checked)}
-                  className="h-3.5 w-3.5 rounded border-zinc-600 bg-zinc-900 text-indigo-500"
+                  className="h-3.5 w-3.5 rounded border-border-input bg-surface-input text-indigo-500"
                 />
                 Required
               </label>

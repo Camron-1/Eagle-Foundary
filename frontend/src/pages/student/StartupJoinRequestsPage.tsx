@@ -83,7 +83,7 @@ export default function StartupJoinRequestsPage(): JSX.Element {
         return profileId ? (
           <button
             type="button"
-            className="text-zinc-300 underline underline-offset-2 hover:text-white"
+            className="text-fg-muted underline underline-offset-2 hover:text-fg"
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/students/${profileId}`);
@@ -92,7 +92,7 @@ export default function StartupJoinRequestsPage(): JSX.Element {
             {name}
           </button>
         ) : (
-          <span className="text-zinc-300">{name}</span>
+          <span className="text-fg-muted">{name}</span>
         );
       },
     },
@@ -100,7 +100,7 @@ export default function StartupJoinRequestsPage(): JSX.Element {
       key: 'message',
       header: 'Message',
       render: (row) => (
-        <span className="max-w-[150px] truncate text-zinc-400" title={row.message ?? undefined}>
+        <span className="max-w-[150px] truncate text-fg-muted" title={row.message ?? undefined}>
           {truncate(row.message, 40)}
         </span>
       ),
@@ -116,7 +116,7 @@ export default function StartupJoinRequestsPage(): JSX.Element {
       render: (row) => (
         <Button
           variant="ghost"
-          className="h-8 px-2 text-zinc-400 hover:text-white"
+          className="h-8 px-2 text-fg-muted hover:text-fg"
           onClick={(e) => {
             e.stopPropagation();
             setViewRequest(row as JoinRequest);
@@ -171,7 +171,7 @@ export default function StartupJoinRequestsPage(): JSX.Element {
             </Button>
           </div>
         ) : (
-          <span className="text-zinc-500">—</span>
+          <span className="text-fg-subtle">—</span>
         ),
     },
   ];
@@ -183,36 +183,36 @@ export default function StartupJoinRequestsPage(): JSX.Element {
 
     return (
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-zinc-200">Application Details</h4>
-        <dl className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4 text-sm">
+        <h4 className="text-sm font-semibold text-fg">Application Details</h4>
+        <dl className="space-y-3 rounded-lg border border-border-subtle bg-surface-tint p-4 text-sm">
           {answers.firstName && (
             <div>
-              <dt className="text-zinc-500">First Name</dt>
-              <dd className="text-zinc-300">{answers.firstName}</dd>
+              <dt className="text-fg-subtle">First Name</dt>
+              <dd className="text-fg-muted">{answers.firstName}</dd>
             </div>
           )}
           {answers.lastName && (
             <div>
-              <dt className="text-zinc-500">Last Name</dt>
-              <dd className="text-zinc-300">{answers.lastName}</dd>
+              <dt className="text-fg-subtle">Last Name</dt>
+              <dd className="text-fg-muted">{answers.lastName}</dd>
             </div>
           )}
           {answers.address && (
             <div>
-              <dt className="text-zinc-500">Address</dt>
-              <dd className="text-zinc-300">{answers.address}</dd>
+              <dt className="text-fg-subtle">Address</dt>
+              <dd className="text-fg-muted">{answers.address}</dd>
             </div>
           )}
           {answers.resumeUrl && (
             <div>
-              <dt className="text-zinc-500">Resume Link</dt>
-              <dd className="text-zinc-300">
+              <dt className="text-fg-subtle">Resume Link</dt>
+              <dd className="text-fg-muted">
                 {/^https?:\/\//i.test(answers.resumeUrl) ? (
                   <a href={answers.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
                     {answers.resumeUrl}
                   </a>
                 ) : (
-                  <span className="text-zinc-300">{answers.resumeUrl}</span>
+                  <span className="text-fg-muted">{answers.resumeUrl}</span>
                 )}
               </dd>
             </div>
@@ -220,18 +220,18 @@ export default function StartupJoinRequestsPage(): JSX.Element {
 
           {/* Custom answers */}
           {answers.customAnswers && typeof answers.customAnswers === 'object' && Object.entries(answers.customAnswers).length > 0 && (
-            <div className="pt-2 border-t border-white/10">
-              <h5 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Custom Questions</h5>
+            <div className="pt-2 border-t border-border-subtle">
+              <h5 className="text-xs font-semibold uppercase tracking-wider text-fg-subtle mb-2">Custom Questions</h5>
               {Object.entries(answers.customAnswers).map(([questionId, answer]) => (
                 <div key={questionId} className="mt-2">
-                  <dt className="text-zinc-400 whitespace-pre-wrap text-xs mb-1">Q: {
+                  <dt className="text-fg-muted whitespace-pre-wrap text-xs mb-1">Q: {
                     // Try to find the original question text from the startup's customQuestions array 
                     // (Note: we don't have the full startup with customQuestions here, so we just show the answer since the ID is a UUID.
                     // But typically a founder knows what they asked, and we could fetch the startup details mapped here.
                     // For now, we will just show the answer under "Custom Answer")
                     "Answer to custom question"
                   }</dt>
-                  <dd className="text-zinc-300 bg-black/20 p-2 rounded">{String(answer)}</dd>
+                  <dd className="text-fg-muted bg-page/20 p-2 rounded">{String(answer)}</dd>
                 </div>
               ))}
             </div>
@@ -244,11 +244,11 @@ export default function StartupJoinRequestsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Startup</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Startup</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Join Requests
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Review and respond to students who want to join your startup.
         </p>
       </header>
@@ -302,25 +302,25 @@ export default function StartupJoinRequestsPage(): JSX.Element {
         {viewRequest && (
           <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
             <div>
-              <h3 className="text-lg font-medium text-white">
+              <h3 className="text-lg font-medium text-fg">
                 {viewRequest.profile?.firstName} {viewRequest.profile?.lastName}
               </h3>
-              <p className="text-sm text-zinc-400">Status: <Badge>{viewRequest.status}</Badge></p>
+              <p className="text-sm text-fg-muted">Status: <Badge>{viewRequest.status}</Badge></p>
             </div>
 
             {viewRequest.formAnswers ? (
               renderFormAnswers(viewRequest.formAnswers as Record<string, string>)
             ) : (
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-zinc-200">Message / Cover Letter</h4>
-                <p className="whitespace-pre-wrap text-sm text-zinc-300 bg-white/5 p-4 rounded-lg border border-white/10">
+                <h4 className="text-sm font-semibold text-fg">Message / Cover Letter</h4>
+                <p className="whitespace-pre-wrap text-sm text-fg-muted bg-surface-tint p-4 rounded-lg border border-border-subtle">
                   {viewRequest.message || 'No message provided.'}
                 </p>
               </div>
             )}
 
             {viewRequest.status === 'PENDING' && (
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle mt-6">
                 <Button
                   variant="ghost"
                   className="text-red-400 hover:bg-red-500/10 hover:text-red-300"

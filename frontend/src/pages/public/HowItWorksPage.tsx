@@ -21,13 +21,13 @@ function StepCard({
       className="ef-card glass-card relative rounded-2xl p-7"
     >
       <div className="mb-5 flex items-start justify-between">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-          <Icon size={20} className="text-zinc-300" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+          <Icon size={20} className="text-fg-muted" />
         </div>
-        <span className="text-4xl font-bold text-white/[0.06] select-none">{number}</span>
+        <span className="select-none text-4xl font-bold text-fg opacity-[0.06]">{number}</span>
       </div>
-      <h3 className="mb-2 text-base font-semibold text-zinc-100">{title}</h3>
-      <p className="text-sm leading-relaxed text-zinc-400">{description}</p>
+      <h3 className="mb-2 text-base font-semibold text-fg">{title}</h3>
+      <p className="text-sm leading-relaxed text-fg-muted">{description}</p>
     </motion.div>
   );
 }
@@ -51,7 +51,7 @@ function Track({
           {badge}
         </span>
         <h2 className="ef-heading-gradient mb-3 text-3xl font-semibold tracking-tight">{title}</h2>
-        <p className="max-w-lg text-sm leading-relaxed text-zinc-400">{description}</p>
+        <p className="max-w-lg text-sm leading-relaxed text-fg-muted">{description}</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, i) => (
@@ -89,10 +89,13 @@ export default function HowItWorksPage(): JSX.Element {
   ];
 
   return (
-    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-black text-white">
+    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-page text-fg">
       {/* Background effects */}
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-white/10 blur-[220px]" />
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-surface-tint-strong blur-[220px]" />
       <div className="pointer-events-none absolute right-[-24rem] top-[20rem] h-[35rem] w-[35rem] rounded-full bg-blue-500/20 blur-[180px]" />
 
       <div className="relative z-10">
@@ -106,13 +109,13 @@ export default function HowItWorksPage(): JSX.Element {
             transition={{ duration: 0.8 }}
             className="mx-auto max-w-2xl"
           >
-            <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-zinc-300">
+            <span className="mb-6 inline-block rounded-full border border-border-subtle bg-surface-tint px-4 py-1.5 text-xs text-fg-muted">
               Platform Overview
             </span>
             <h1 className="ef-heading-gradient mb-5 text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
               How Eagle-Foundry works
             </h1>
-            <p className="text-sm leading-relaxed text-zinc-400 md:text-base">
+            <p className="text-sm leading-relaxed text-fg-muted md:text-base">
               Two paths. One platform. Students build ventures and get funded.
               Companies discover talent and invest early. Here's how it all connects.
             </p>
@@ -144,7 +147,7 @@ export default function HowItWorksPage(): JSX.Element {
         <SectionShell>
           <Track
             badge="For Companies"
-            badgeColor="border-zinc-500/30 bg-zinc-500/10 text-zinc-300"
+            badgeColor="border-border-subtle bg-surface-tint text-fg-muted"
             title="Discover, hire, and invest early"
             description="Access a curated pipeline of ambitious student founders and emerging startups before they raise anywhere else."
             steps={companySteps}
@@ -162,7 +165,7 @@ export default function HowItWorksPage(): JSX.Element {
             className="glass-card mx-auto max-w-xl rounded-3xl p-10"
           >
             <h2 className="ef-heading-gradient mb-4 text-3xl font-semibold">Ready to get started?</h2>
-            <p className="mb-8 text-sm text-zinc-400">Join the network where ambition meets opportunity.</p>
+            <p className="mb-8 text-sm text-fg-muted">Join the network where ambition meets opportunity.</p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button withBorderEffect={false} className="gap-2 px-6" onClick={() => navigate('/sign-up')}>
                 Create your account <ArrowRight size={14} />

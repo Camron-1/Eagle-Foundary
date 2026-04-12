@@ -47,7 +47,7 @@ export default function OrganizationsPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <header>
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
           <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
             Organizations
           </h1>
@@ -63,7 +63,7 @@ export default function OrganizationsPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <header>
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
           <Skeleton className="mt-2 h-12 w-64" />
           <Skeleton className="mt-3 h-5 w-96" />
         </header>
@@ -79,11 +79,11 @@ export default function OrganizationsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Organizations
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Explore companies and partners active on Eagle-Foundry.
         </p>
       </header>
@@ -111,11 +111,11 @@ export default function OrganizationsPage(): JSX.Element {
               tabIndex={0}
               onClick={() => navigate(`/organizations/${org.id}`)}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/organizations/${org.id}`)}
-              className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-2xl h-full"
+              className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-strong focus-visible:ring-offset-2 focus-visible:ring-offset-page rounded-2xl h-full"
             >
               <Card interactive className="h-full flex flex-col">
-                <h3 className="text-lg font-semibold text-white">{org.name}</h3>
-                <p className="mt-2 flex-1 text-sm text-zinc-400 line-clamp-3">
+                <h3 className="text-lg font-semibold text-fg">{org.name}</h3>
+                <p className="mt-2 flex-1 text-sm text-fg-muted line-clamp-3">
                   {truncate(org.description, 120)}
                 </p>
                 <div className="mt-3">

@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import { AppLogo } from '@/components/brand/AppLogo';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useEfCardPointer } from '@/hooks/useEfCardPointer';
 import type { PageConfig, PageLink } from '@/pages/_shared/types';
 
@@ -35,9 +37,9 @@ function ActionButton({ label, to, variant = 'ghost', className, withBorderEffec
 
 function TableBlock({ columns, rows }: NonNullable<PageConfig['table']>): JSX.Element {
   return (
-    <div className="mt-5 overflow-x-auto rounded-2xl border border-white/10 bg-black/45">
+    <div className="mt-5 overflow-x-auto rounded-2xl border border-border-subtle bg-surface">
       <table className="w-full min-w-[560px] text-left text-sm">
-        <thead className="border-b border-white/10 text-xs uppercase tracking-[0.12em] text-zinc-400">
+        <thead className="border-b border-border-subtle text-xs uppercase tracking-[0.12em] text-fg-muted">
           <tr>
             {columns.map((column) => (
               <th key={column} className="px-3 py-3 font-medium">
@@ -48,7 +50,7 @@ function TableBlock({ columns, rows }: NonNullable<PageConfig['table']>): JSX.El
         </thead>
         <tbody>
           {rows.map((row, rowIndex) => (
-            <tr key={rowIndex} className="border-b border-white/5 text-zinc-200 last:border-b-0">
+            <tr key={rowIndex} className="border-b border-border-subtle text-fg last:border-b-0">
               {row.map((cell, cellIndex) => (
                 <td key={cellIndex} className="px-3 py-3">
                   {cell}
@@ -68,9 +70,9 @@ function FieldGrid({ fields }: { fields?: string[] }): JSX.Element | null {
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-2">
       {fields.map((field) => (
-        <div key={field} className="space-y-1.5 text-xs uppercase tracking-[0.14em] text-zinc-400" role="group" aria-label={`Preview for ${field}`}>
+        <div key={field} className="space-y-1.5 text-xs uppercase tracking-[0.14em] text-fg-muted" role="group" aria-label={`Preview for ${field}`}>
           <span>{field}</span>
-          <div className="rounded-xl border border-white/12 bg-black/60 px-3 py-2.5 text-sm normal-case tracking-normal text-zinc-500">
+          <div className="rounded-xl border border-border-input bg-surface-input px-3 py-2.5 text-sm normal-case tracking-normal text-fg-subtle">
             Input preview
           </div>
         </div>
@@ -83,9 +85,9 @@ function LinksBlock({ links }: { links?: PageLink[] }): JSX.Element | null {
   if (!links?.length) return null;
 
   return (
-    <div className="mt-5 flex flex-wrap gap-3 text-sm text-zinc-300">
+    <div className="mt-5 flex flex-wrap gap-3 text-sm text-fg-muted">
       {links.map((link) => (
-        <Link key={`${link.label}-${link.to}`} className="underline underline-offset-4 hover:text-white" to={link.to}>
+        <Link key={`${link.label}-${link.to}`} className="underline underline-offset-4 hover:text-fg" to={link.to}>
           {link.label}
         </Link>
       ))}
@@ -99,7 +101,7 @@ function MetricsBlock({ metrics }: { metrics?: string[] }): JSX.Element | null {
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
-        <div key={metric} className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-200">
+        <div key={metric} className="rounded-xl border border-border-subtle bg-surface px-3 py-2 text-sm text-fg">
           {metric}
         </div>
       ))}
@@ -113,7 +115,7 @@ function FilterBlock({ filters }: { filters?: string[] }): JSX.Element | null {
   return (
     <div className="mt-5 flex flex-wrap gap-2">
       {filters.map((filter) => (
-        <span key={filter} className="rounded-full border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-300">
+        <span key={filter} className="rounded-full border border-border-strong bg-surface-faint px-3 py-1.5 text-xs text-fg-muted">
           {filter}
         </span>
       ))}
@@ -130,7 +132,7 @@ function TabsBlock({ tabs }: { tabs?: string[] }): JSX.Element | null {
         <span
           key={tab}
           className={`rounded-full border px-3 py-1.5 text-xs ${
-            index === 0 ? 'border-white/30 bg-white/10 text-white' : 'border-white/12 bg-white/[0.02] text-zinc-300'
+            index === 0 ? 'border-border-strong bg-surface-tint-strong text-fg' : 'border-border-input bg-surface-faint text-fg-muted'
           }`}
         >
           {tab}
@@ -143,9 +145,9 @@ function TabsBlock({ tabs }: { tabs?: string[] }): JSX.Element | null {
 function HeaderBlock({ config }: Props): JSX.Element {
   return (
     <header>
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">{config.eyebrow}</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">{config.eyebrow}</p>
       <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">{config.title}</h1>
-      <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">{config.subtitle}</p>
+      <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">{config.subtitle}</p>
       <TabsBlock tabs={config.tabs} />
       <FilterBlock filters={config.filters} />
       <MetricsBlock metrics={config.metrics} />
@@ -155,11 +157,11 @@ function HeaderBlock({ config }: Props): JSX.Element {
 
 function PrimaryContent({ config }: Props): JSX.Element {
   return (
-    <section className="rounded-2xl border border-white/10 bg-black/45 p-5">
+    <section className="rounded-2xl border border-border-subtle bg-surface p-5">
       {config.tags?.length ? (
         <div className="flex flex-wrap gap-2">
           {config.tags.map((tag) => (
-            <span key={tag} className="rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-xs text-zinc-200">
+            <span key={tag} className="rounded-full border border-border-strong bg-surface-faint px-3 py-1 text-xs text-fg">
               {tag}
             </span>
           ))}
@@ -190,9 +192,9 @@ function PrimaryContent({ config }: Props): JSX.Element {
 
 function Rail({ rail }: { rail: NonNullable<PageConfig['rail']> }): JSX.Element {
   return (
-    <aside className="rounded-2xl border border-white/10 bg-black/45 p-5">
-      <h2 className="text-lg font-semibold text-white">{rail.title}</h2>
-      <ul className="mt-3 space-y-2 text-sm text-zinc-300">
+    <aside className="rounded-2xl border border-border-subtle bg-surface p-5">
+      <h2 className="text-lg font-semibold text-fg">{rail.title}</h2>
+      <ul className="mt-3 space-y-2 text-sm text-fg-muted">
         {rail.lines.map((line) => (
           <li key={line}>{line}</li>
         ))}
@@ -227,9 +229,9 @@ function RoleLayout({ config }: Props): JSX.Element {
       <HeaderBlock config={config} />
       <div className="grid gap-4 md:grid-cols-3">
         {cardLinks.map((item) => (
-          <article key={item.label} className="ef-card rounded-2xl border border-white/10 bg-black/45 p-5">
-            <h3 className="text-lg font-semibold text-white">{item.label}</h3>
-            <p className="mt-2 text-sm text-zinc-300">Continue with the {item.label.toLowerCase()} onboarding flow.</p>
+          <article key={item.label} className="ef-card rounded-2xl border border-border-subtle bg-surface p-5">
+            <h3 className="text-lg font-semibold text-fg">{item.label}</h3>
+            <p className="mt-2 text-sm text-fg-muted">Continue with the {item.label.toLowerCase()} onboarding flow.</p>
             <ActionButton
               label={`Continue as ${item.label}`}
               to={item.to}
@@ -278,17 +280,21 @@ export function PageScaffold({ config }: Props): JSX.Element {
   const { rootRef, onPointerMove } = useEfCardPointer<HTMLElement>();
 
   return (
-    <main ref={rootRef} onPointerMove={onPointerMove} className="relative min-h-screen overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.1]" />
-      <div className="pointer-events-none absolute left-[-18rem] top-[-20rem] h-[36rem] w-[36rem] rounded-full bg-white/10 blur-[180px]" />
+    <main ref={rootRef} onPointerMove={onPointerMove} className="relative min-h-screen overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute left-[-18rem] top-[-20rem] h-[36rem] w-[36rem] rounded-full bg-surface-tint-strong blur-[180px]" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1320px] px-6 py-10 md:px-8 md:py-14">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <Link to="/" className="inline-flex items-center gap-3">
-            <img src="/assets/brand/logo-dark-512.png" alt="Eagle-Foundry" className="h-8 w-8 rounded-full" />
-            <span className="text-sm font-semibold tracking-wide text-zinc-100">Eagle-Foundry</span>
+            <AppLogo className="h-8 w-8 rounded-full" />
+            <span className="text-sm font-semibold tracking-wide text-fg">Eagle-Foundry</span>
           </Link>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <ThemeToggle />
             <ActionButton label="Landing" to="/" variant="ghost" />
             <ActionButton label="Login" to="/login" variant="ghost" />
             <ActionButton label="Student" to="/student/dashboard" variant="ghost" />
@@ -301,7 +307,7 @@ export function PageScaffold({ config }: Props): JSX.Element {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="ef-card rounded-3xl border border-white/10 bg-zinc-950/80 p-6 md:p-8"
+          className="ef-card rounded-3xl border border-border-subtle bg-panel p-6 md:p-8"
         >
           {config.kind === 'auth' ? <AuthLayout config={config} /> : null}
           {config.kind === 'workspace' ? <WorkspaceLayout config={config} /> : null}

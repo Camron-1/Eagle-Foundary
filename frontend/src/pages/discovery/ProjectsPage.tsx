@@ -64,12 +64,12 @@ export default function ProjectsPage(): JSX.Element {
     {
       key: 'title',
       header: 'Project',
-      render: (row) => <span className="font-medium text-zinc-200">{row.title}</span>,
+      render: (row) => <span className="font-medium text-fg">{row.title}</span>,
     },
     {
       key: 'org',
       header: 'Organization',
-      render: (row) => <span className="text-zinc-400">{row.org?.name ?? '—'}</span>,
+      render: (row) => <span className="text-fg-muted">{row.org?.name ?? '—'}</span>,
     },
     {
       key: 'budgetType',
@@ -88,9 +88,9 @@ export default function ProjectsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">Projects</h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Browse company outsourced projects and submit your proposal.
         </p>
       </header>

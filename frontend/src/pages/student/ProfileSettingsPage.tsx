@@ -153,7 +153,7 @@ export default function ProfileSettingsPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Profile Settings</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -161,11 +161,11 @@ export default function ProfileSettingsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Student</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Student</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Profile Settings
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Manage your profile details and public identity.
         </p>
       </header>

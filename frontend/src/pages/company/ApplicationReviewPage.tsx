@@ -92,7 +92,7 @@ export default function ApplicationReviewPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Application Review</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -103,7 +103,7 @@ export default function ApplicationReviewPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Application Review</h1>
         </header>
-        <p className="text-zinc-400">Application not found.</p>
+        <p className="text-fg-muted">Application not found.</p>
       </div>
     );
   }
@@ -111,11 +111,11 @@ export default function ApplicationReviewPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Application Review
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Review application for {opportunity?.title ?? 'this opportunity'}
         </p>
       </header>
@@ -134,11 +134,11 @@ export default function ApplicationReviewPage(): JSX.Element {
               size="lg"
             />
             <div className="flex-1 space-y-2">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-fg">
                 {`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() || '—'}
               </h3>
               {profile.major && (
-                <p className="text-sm text-zinc-400">{profile.major}</p>
+                <p className="text-sm text-fg-muted">{profile.major}</p>
               )}
               {profile.skills?.length ? (
                 <div className="flex flex-wrap gap-1.5 pt-2">
@@ -147,13 +147,13 @@ export default function ApplicationReviewPage(): JSX.Element {
                   ))}
                 </div>
               ) : null}
-              <div className="flex flex-wrap gap-4 pt-2 text-sm text-zinc-400">
+              <div className="flex flex-wrap gap-4 pt-2 text-sm text-fg-muted">
                 {profile.linkedinUrl && (
                   <a
                     href={profile.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline hover:text-white"
+                    className="underline hover:text-fg"
                   >
                     LinkedIn
                   </a>
@@ -163,7 +163,7 @@ export default function ApplicationReviewPage(): JSX.Element {
                     href={profile.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline hover:text-white"
+                    className="underline hover:text-fg"
                   >
                     GitHub
                   </a>
@@ -176,34 +176,34 @@ export default function ApplicationReviewPage(): JSX.Element {
 
       {activeTab === 'Application Form' && (
         <Card>
-          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">
+          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">
             Application Details
           </h3>
           {!application.formAnswers || Object.keys(application.formAnswers).length === 0 ? (
-            <p className="text-sm text-zinc-500">No application form data provided.</p>
+            <p className="text-sm text-fg-subtle">No application form data provided.</p>
           ) : (
             <dl className="space-y-4 text-sm">
               {application.formAnswers.firstName && (
                 <div>
-                  <dt className="text-zinc-500">First Name</dt>
-                  <dd className="text-zinc-300 mt-1">{application.formAnswers.firstName}</dd>
+                  <dt className="text-fg-subtle">First Name</dt>
+                  <dd className="text-fg-muted mt-1">{application.formAnswers.firstName}</dd>
                 </div>
               )}
               {application.formAnswers.lastName && (
                 <div>
-                  <dt className="text-zinc-500">Last Name</dt>
-                  <dd className="text-zinc-300 mt-1">{application.formAnswers.lastName}</dd>
+                  <dt className="text-fg-subtle">Last Name</dt>
+                  <dd className="text-fg-muted mt-1">{application.formAnswers.lastName}</dd>
                 </div>
               )}
               {application.formAnswers.address && (
                 <div>
-                  <dt className="text-zinc-500">Address</dt>
-                  <dd className="text-zinc-300 mt-1">{application.formAnswers.address}</dd>
+                  <dt className="text-fg-subtle">Address</dt>
+                  <dd className="text-fg-muted mt-1">{application.formAnswers.address}</dd>
                 </div>
               )}
               {application.formAnswers.resumeUrl && (
                 <div>
-                  <dt className="text-zinc-500">Resume Link</dt>
+                  <dt className="text-fg-subtle">Resume Link</dt>
                   <dd className="mt-1 text-blue-400 hover:underline">
                     <a href={application.formAnswers.resumeUrl as string} target="_blank" rel="noopener noreferrer">
                       {application.formAnswers.resumeUrl}
@@ -216,13 +216,13 @@ export default function ApplicationReviewPage(): JSX.Element {
               {application.formAnswers.customAnswers &&
                 typeof application.formAnswers.customAnswers === 'object' &&
                 Object.keys(application.formAnswers.customAnswers).length > 0 && (
-                  <div className="pt-4 border-t border-white/10 mt-4">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Custom Questions</h4>
+                  <div className="pt-4 border-t border-border-subtle mt-4">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-fg-subtle mb-3">Custom Questions</h4>
                     <div className="space-y-4">
                       {Object.entries(application.formAnswers.customAnswers).map(([qId, answer]) => (
                         <div key={qId}>
-                          <dt className="text-zinc-400 text-xs mb-1">Answer to custom question:</dt>
-                          <dd className="text-zinc-300 bg-white/5 p-3 rounded-lg whitespace-pre-wrap border border-white/10">
+                          <dt className="text-fg-muted text-xs mb-1">Answer to custom question:</dt>
+                          <dd className="text-fg-muted bg-surface-tint p-3 rounded-lg whitespace-pre-wrap border border-border-subtle">
                             {String(answer)}
                           </dd>
                         </div>
@@ -237,10 +237,10 @@ export default function ApplicationReviewPage(): JSX.Element {
 
       {activeTab === 'Cover Letter' && (
         <Card>
-          <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">
+          <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">
             Cover Letter
           </h3>
-          <p className="whitespace-pre-wrap text-sm text-zinc-300">
+          <p className="whitespace-pre-wrap text-sm text-fg-muted">
             {application.coverLetter || 'No cover letter provided.'}
           </p>
           {application.resumeUrl && (
@@ -249,7 +249,7 @@ export default function ApplicationReviewPage(): JSX.Element {
                 href={application.resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-zinc-300 underline hover:text-white"
+                className="text-sm text-fg-muted underline hover:text-fg"
               >
                 Download resume
               </a>
@@ -260,27 +260,27 @@ export default function ApplicationReviewPage(): JSX.Element {
 
       {activeTab === 'Status History' && (
         <Card>
-          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">
+          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">
             Status History
           </h3>
           <div className="space-y-3">
             {statusHistory.length === 0 ? (
-              <p className="text-sm text-zinc-500">No status changes yet.</p>
+              <p className="text-sm text-fg-subtle">No status changes yet.</p>
             ) : (
               statusHistory.map((entry: ApplicationStatusHistoryEntry) => (
                 <div
                   key={entry.id}
-                  className="flex flex-wrap items-start gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0"
+                  className="flex flex-wrap items-start gap-3 border-b border-border-subtle pb-3 last:border-0 last:pb-0"
                 >
                   <Badge>{entry.toStatus}</Badge>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-fg-subtle">
                     {(() => {
                       const d = entry.createdAt ? new Date(entry.createdAt) : null;
                       return d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy HH:mm') : '—';
                     })()}
                   </span>
                   {entry.note && (
-                    <p className="w-full text-sm text-zinc-400">{entry.note}</p>
+                    <p className="w-full text-sm text-fg-muted">{entry.note}</p>
                   )}
                 </div>
               ))
@@ -290,7 +290,7 @@ export default function ApplicationReviewPage(): JSX.Element {
       )}
 
       <Card>
-        <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">
+        <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">
           Update Status
         </h3>
         <form onSubmit={handleSubmit(onStatusSubmit)} className="space-y-4">

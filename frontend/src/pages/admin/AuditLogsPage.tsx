@@ -64,23 +64,23 @@ export default function AuditLogsPage(): JSX.Element {
     {
       key: 'action',
       header: 'Action',
-      render: (row) => <span className="font-medium text-zinc-200">{row.action}</span>,
+      render: (row) => <span className="font-medium text-fg">{row.action}</span>,
     },
     {
       key: 'userId',
       header: 'Actor',
-      render: (row) => <span className="text-zinc-400 font-mono text-xs">{row.userId}</span>,
+      render: (row) => <span className="text-fg-muted font-mono text-xs">{row.userId}</span>,
     },
     {
       key: 'targetType',
       header: 'Target Type',
-      render: (row) => <span className="text-zinc-400">{row.targetType}</span>,
+      render: (row) => <span className="text-fg-muted">{row.targetType}</span>,
     },
     {
       key: 'targetId',
       header: 'Target ID',
       render: (row) => (
-        <span className="font-mono text-xs text-zinc-500 truncate max-w-[120px] block">
+        <span className="font-mono text-xs text-fg-subtle truncate max-w-[120px] block">
           {row.targetId}
         </span>
       ),
@@ -91,7 +91,7 @@ export default function AuditLogsPage(): JSX.Element {
       render: (row) => {
         const d = row.createdAt ? new Date(row.createdAt as string) : null;
         return (
-          <span className="text-zinc-400">
+          <span className="text-fg-muted">
             {d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy HH:mm') : '—'}
           </span>
         );
@@ -104,11 +104,11 @@ export default function AuditLogsPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Admin</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Admin</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Audit Logs
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Immutable record of admin actions across the platform.
         </p>
       </header>

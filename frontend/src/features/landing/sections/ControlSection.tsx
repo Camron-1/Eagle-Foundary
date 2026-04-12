@@ -20,14 +20,14 @@ export function ControlSection(): JSX.Element {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: 0.7 }}
-        className="ef-card mt-10 rounded-2xl border border-white/15 bg-zinc-950"
+        className="ef-card mt-10 rounded-2xl border border-border-strong bg-panel"
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 text-xs text-zinc-400">
+        <div className="flex items-center justify-between border-b border-border-subtle px-5 py-4 text-xs text-fg-muted">
           <span>Platform analytics · Monthly venture activity</span>
           <span>Updated 2m ago</span>
         </div>
         <div className="h-[340px] p-6">
-          <div className="ef-card ef-card-soft flex h-full items-end justify-between gap-2 rounded-xl border border-white/10 bg-black/45 p-4">
+          <div className="ef-card ef-card-soft flex h-full items-end justify-between gap-2 rounded-xl border border-border-subtle bg-surface p-4">
             {bars.map((height, index) => (
               <div key={index} className="flex h-full items-end">
                 <div

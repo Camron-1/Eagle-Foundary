@@ -85,9 +85,9 @@ export default function MfaChallengePage(): JSX.Element {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Account Security</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Account Security</p>
       <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Enter verification code</h1>
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className="mt-2 text-sm text-fg-muted">
         Complete sign-in using your authenticator app.
       </p>
 
@@ -116,15 +116,15 @@ export default function MfaChallengePage(): JSX.Element {
         </Button>
       </form>
 
-      <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-400">
+      <div className="mt-5 flex flex-wrap gap-4 text-sm text-fg-muted">
         <button
           type="button"
-          className="underline underline-offset-4 hover:text-white"
+          className="underline underline-offset-4 hover:text-fg"
           onClick={() => setUseBackupCode((prev) => !prev)}
         >
           {useBackupCode ? 'Use authenticator code' : 'Use backup code'}
         </button>
-        <Link to="/login" className="underline underline-offset-4 hover:text-white">Back to login</Link>
+        <Link to="/login" className="underline underline-offset-4 hover:text-fg">Back to login</Link>
       </div>
     </div>
   );

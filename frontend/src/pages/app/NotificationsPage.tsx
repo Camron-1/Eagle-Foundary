@@ -91,10 +91,10 @@ export default function NotificationsPage(): JSX.Element {
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
-              className="animate-pulse rounded-xl border border-white/10 bg-black/45 p-4"
+              className="animate-pulse rounded-xl border border-border-subtle bg-surface p-4"
             >
-              <div className="h-4 w-3/4 rounded bg-white/5" />
-              <div className="mt-2 h-3 w-1/2 rounded bg-white/5" />
+              <div className="h-4 w-3/4 rounded bg-surface-tint" />
+              <div className="mt-2 h-3 w-1/2 rounded bg-surface-tint" />
             </div>
           ))}
         </div>
@@ -111,11 +111,11 @@ export default function NotificationsPage(): JSX.Element {
               className={cn(
                 'flex items-start gap-4 rounded-xl border p-4 transition-colors',
                 n.readAt
-                  ? 'border-white/10 bg-black/30'
-                  : 'border-l-4 border-l-amber-500/50 border-white/10 bg-white/[0.03]',
+                  ? 'border-border-subtle bg-page/30'
+                  : 'border-l-4 border-l-amber-500/50 border-border-subtle bg-surface-faint',
               )}
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-lg">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-tint text-lg">
                 {getTypeIcon(n.type)}
               </div>
               <div
@@ -125,11 +125,11 @@ export default function NotificationsPage(): JSX.Element {
                 onClick={() => !n.readAt && markReadMutation.mutate(n.id)}
                 onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !n.readAt) markReadMutation.mutate(n.id); }}
               >
-                <p className={cn('text-sm', n.readAt ? 'font-normal text-zinc-400' : 'font-semibold text-zinc-200')}>
+                <p className={cn('text-sm', n.readAt ? 'font-normal text-fg-muted' : 'font-semibold text-fg')}>
                   {n.title}
                 </p>
-                <p className="mt-0.5 text-sm text-zinc-500">{n.message}</p>
-                <p className="mt-1 text-xs text-zinc-600">
+                <p className="mt-0.5 text-sm text-fg-subtle">{n.message}</p>
+                <p className="mt-1 text-xs text-fg-subtle">
                   {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export default function NotificationsPage(): JSX.Element {
                   <button
                     type="button"
                     onClick={() => markReadMutation.mutate(n.id)}
-                    className="rounded-lg p-2 text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                    className="rounded-lg p-2 text-fg-subtle hover:bg-surface-tint hover:text-fg-muted"
                     title="Mark as read"
                   >
                     <Bell size={14} />
@@ -147,7 +147,7 @@ export default function NotificationsPage(): JSX.Element {
                 <button
                   type="button"
                   onClick={() => deleteMutation.mutate(n.id)}
-                  className="rounded-lg p-2 text-zinc-500 hover:bg-white/5 hover:text-red-400"
+                  className="rounded-lg p-2 text-fg-subtle hover:bg-surface-tint hover:text-red-400"
                   title="Delete"
                 >
                   <Trash2 size={14} />

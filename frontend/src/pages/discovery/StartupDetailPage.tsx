@@ -144,7 +144,7 @@ export default function StartupDetailPage(): JSX.Element {
       render: (row) => {
         const p = row.profile;
         const name = p ? `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim() || '—' : '—';
-        return <span className="text-zinc-300">{name}</span>;
+        return <span className="text-fg-muted">{name}</span>;
       },
     },
     {
@@ -157,7 +157,7 @@ export default function StartupDetailPage(): JSX.Element {
       header: 'Joined',
       render: (row) => {
         const d = row.joinedAt ? new Date(row.joinedAt) : null;
-        return <span className="text-zinc-400">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
+        return <span className="text-fg-muted">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
       },
     },
   ];
@@ -183,7 +183,7 @@ export default function StartupDetailPage(): JSX.Element {
     return (
       <div className="space-y-8">
         <h1 className="ef-heading-gradient text-4xl font-semibold">Startup not found</h1>
-        <Link to="/startups" className="text-sm text-zinc-400 underline hover:text-white">
+        <Link to="/startups" className="text-sm text-fg-muted underline hover:text-fg">
           Back to discovery
         </Link>
       </div>
@@ -193,12 +193,12 @@ export default function StartupDetailPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Discovery</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Discovery</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           {startup.name}
         </h1>
         {startup.tagline && (
-          <p className="mt-2 text-lg text-zinc-300">{startup.tagline}</p>
+          <p className="mt-2 text-lg text-fg-muted">{startup.tagline}</p>
         )}
         <div className="mt-3 flex flex-wrap gap-2">
           {startup.stage && <Badge>{startup.stage}</Badge>}
@@ -221,7 +221,7 @@ export default function StartupDetailPage(): JSX.Element {
           !isMember &&
           !isMemberViaStartup &&
           !(startup as StartupWithMembers)?.acceptingJoinRequests && (
-            <p className="mt-4 text-sm text-zinc-500">
+            <p className="mt-4 text-sm text-fg-subtle">
               This startup is not currently accepting join requests.
             </p>
           )}
@@ -236,7 +236,7 @@ export default function StartupDetailPage(): JSX.Element {
       {activeTab === 'Overview' && (
         <div className="space-y-4">
           {startup.description && (
-            <p className="text-sm text-zinc-400 whitespace-pre-wrap">{startup.description}</p>
+            <p className="text-sm text-fg-muted whitespace-pre-wrap">{startup.description}</p>
           )}
           {startup.tags?.length ? (
             <div className="flex flex-wrap gap-2">
@@ -262,7 +262,7 @@ export default function StartupDetailPage(): JSX.Element {
         title="Request to Join"
       >
         <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-          <p className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Required Information</p>
+          <p className="text-xs text-fg-subtle uppercase tracking-wide mb-2">Required Information</p>
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="First Name"
@@ -300,7 +300,7 @@ export default function StartupDetailPage(): JSX.Element {
 
           {customQuestions.length > 0 && (
             <>
-              <p className="text-xs text-zinc-500 uppercase tracking-wide mt-4">Additional Questions from Founder</p>
+              <p className="text-xs text-fg-subtle uppercase tracking-wide mt-4">Additional Questions from Founder</p>
               {customQuestions.map((q) => (
                 <Textarea
                   key={q.id}

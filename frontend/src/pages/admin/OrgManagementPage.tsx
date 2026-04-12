@@ -169,13 +169,13 @@ export default function OrgManagementPage(): JSX.Element {
     {
       key: 'name',
       header: 'Name',
-      render: (row) => <span className="font-medium text-zinc-200">{row.name}</span>,
+      render: (row) => <span className="font-medium text-fg">{row.name}</span>,
     },
     {
       key: 'members',
       header: 'Members',
       render: (row) => (
-        <span className="text-zinc-400">{row._count?.members ?? 0}</span>
+        <span className="text-fg-muted">{row._count?.members ?? 0}</span>
       ),
     },
     {
@@ -207,8 +207,8 @@ export default function OrgManagementPage(): JSX.Element {
       header: 'Organization',
       render: (row) => (
         <div className="space-y-0.5">
-          <p className="font-medium text-zinc-200">{row.name}</p>
-          <p className="text-xs text-zinc-500">{(row.verifiedDomains ?? []).join(', ') || 'No domains set'}</p>
+          <p className="font-medium text-fg">{row.name}</p>
+          <p className="text-xs text-fg-subtle">{(row.verifiedDomains ?? []).join(', ') || 'No domains set'}</p>
         </div>
       ),
     },
@@ -216,7 +216,7 @@ export default function OrgManagementPage(): JSX.Element {
       key: 'submittedAt',
       header: 'Submitted',
       render: (row) => (
-        <span className="text-zinc-400">
+        <span className="text-fg-muted">
           {row.verificationSubmittedAt ? new Date(row.verificationSubmittedAt).toLocaleString() : 'N/A'}
         </span>
       ),
@@ -251,11 +251,11 @@ export default function OrgManagementPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Admin</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Admin</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Organization Management
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Manage organization status, verification, and domain allowlists.
         </p>
       </header>
@@ -367,9 +367,9 @@ export default function OrgManagementPage(): JSX.Element {
           />
 
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.12em] text-zinc-500">Verification documents</p>
+            <p className="text-xs uppercase tracking-[0.12em] text-fg-subtle">Verification documents</p>
             {verificationDocsLoading ? (
-              <div className="h-24 animate-pulse rounded-xl bg-white/5" />
+              <div className="h-24 animate-pulse rounded-xl bg-surface-tint" />
             ) : verificationDocs?.items.length ? (
               <div className="space-y-2">
                 {verificationDocs.items.map((doc) => (
@@ -378,15 +378,15 @@ export default function OrgManagementPage(): JSX.Element {
                     href={doc.downloadUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="block rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-sm text-zinc-200 hover:border-white/20"
+                    className="block rounded-xl border border-border-subtle bg-surface px-3 py-2 text-sm text-fg hover:border-border-strong"
                   >
                     <p>{doc.filename}</p>
-                    <p className="mt-0.5 text-xs text-zinc-500">Uploaded {new Date(doc.createdAt).toLocaleString()}</p>
+                    <p className="mt-0.5 text-xs text-fg-subtle">Uploaded {new Date(doc.createdAt).toLocaleString()}</p>
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">No verification documents uploaded.</p>
+              <p className="text-sm text-fg-subtle">No verification documents uploaded.</p>
             )}
           </div>
 

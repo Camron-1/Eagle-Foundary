@@ -94,7 +94,7 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Project Submission Review</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Project Submission Review</h1>
         </header>
-        <p className="text-zinc-400">Submission not found.</p>
+        <p className="text-fg-muted">Submission not found.</p>
       </div>
     );
   }
@@ -113,11 +113,11 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <h1 className="ef-heading-gradient mt-2 text-4xl font-semibold leading-tight md:text-5xl">
           Project Submission Review
         </h1>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Review submission for {project?.title ?? 'this project'}
         </p>
       </header>
@@ -129,8 +129,8 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
           <div className="flex flex-wrap items-start gap-6">
             <Avatar name={`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim()} size="lg" />
             <div className="flex-1 space-y-2">
-              <h3 className="text-lg font-semibold text-white">{`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() || '—'}</h3>
-              {profile.major && <p className="text-sm text-zinc-400">{profile.major}</p>}
+              <h3 className="text-lg font-semibold text-fg">{`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() || '—'}</h3>
+              {profile.major && <p className="text-sm text-fg-muted">{profile.major}</p>}
               {profile.skills?.length ? (
                 <div className="flex flex-wrap gap-1.5 pt-2">
                   {profile.skills.map((s) => (
@@ -145,32 +145,32 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
 
       {activeTab === 'Submission Form' && (
         <Card>
-          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">Submission Details</h3>
+          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">Submission Details</h3>
           {!submission.formAnswers || Object.keys(submission.formAnswers).length === 0 ? (
-            <p className="text-sm text-zinc-500">No submission form data provided.</p>
+            <p className="text-sm text-fg-subtle">No submission form data provided.</p>
           ) : (
             <dl className="space-y-4 text-sm">
               {submission.formAnswers.firstName && (
                 <div>
-                  <dt className="text-zinc-500">First Name</dt>
-                  <dd className="mt-1 text-zinc-300">{submission.formAnswers.firstName}</dd>
+                  <dt className="text-fg-subtle">First Name</dt>
+                  <dd className="mt-1 text-fg-muted">{submission.formAnswers.firstName}</dd>
                 </div>
               )}
               {submission.formAnswers.lastName && (
                 <div>
-                  <dt className="text-zinc-500">Last Name</dt>
-                  <dd className="mt-1 text-zinc-300">{submission.formAnswers.lastName}</dd>
+                  <dt className="text-fg-subtle">Last Name</dt>
+                  <dd className="mt-1 text-fg-muted">{submission.formAnswers.lastName}</dd>
                 </div>
               )}
               {submission.formAnswers.address && (
                 <div>
-                  <dt className="text-zinc-500">Address</dt>
-                  <dd className="mt-1 text-zinc-300">{submission.formAnswers.address}</dd>
+                  <dt className="text-fg-subtle">Address</dt>
+                  <dd className="mt-1 text-fg-muted">{submission.formAnswers.address}</dd>
                 </div>
               )}
               {submission.formAnswers.resumeUrl && (
                 <div>
-                  <dt className="text-zinc-500">Resume Link</dt>
+                  <dt className="text-fg-subtle">Resume Link</dt>
                   <dd className="mt-1 text-blue-400 hover:underline">
                     <a href={submission.formAnswers.resumeUrl as string} target="_blank" rel="noopener noreferrer">
                       {submission.formAnswers.resumeUrl}
@@ -179,13 +179,13 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
                 </div>
               )}
               {submission.formAnswers.customAnswers && typeof submission.formAnswers.customAnswers === 'object' && (
-                <div className="mt-4 border-t border-white/10 pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Custom Questions</h4>
+                <div className="mt-4 border-t border-border-subtle pt-4">
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-fg-subtle">Custom Questions</h4>
                   <div className="space-y-4">
                     {Object.entries(submission.formAnswers.customAnswers).map(([qId, answer]) => (
                       <div key={qId}>
-                        <dt className="mb-1 text-xs text-zinc-400">Answer to custom question:</dt>
-                        <dd className="whitespace-pre-wrap rounded-lg border border-white/10 bg-white/5 p-3 text-zinc-300">
+                        <dt className="mb-1 text-xs text-fg-muted">Answer to custom question:</dt>
+                        <dd className="whitespace-pre-wrap rounded-lg border border-border-subtle bg-surface-tint p-3 text-fg-muted">
                           {String(answer)}
                         </dd>
                       </div>
@@ -200,11 +200,11 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
 
       {activeTab === 'Cover Letter' && (
         <Card>
-          <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">Cover Letter</h3>
-          <p className="whitespace-pre-wrap text-sm text-zinc-300">{submission.coverLetter || 'No cover letter provided.'}</p>
+          <h3 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">Cover Letter</h3>
+          <p className="whitespace-pre-wrap text-sm text-fg-muted">{submission.coverLetter || 'No cover letter provided.'}</p>
           {submission.resumeUrl && (
             <div className="mt-4">
-              <a href={submission.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-300 underline hover:text-white">
+              <a href={submission.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-fg-muted underline hover:text-fg">
                 Download resume
               </a>
             </div>
@@ -214,21 +214,21 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
 
       {activeTab === 'Status History' && (
         <Card>
-          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">Status History</h3>
+          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">Status History</h3>
           <div className="space-y-3">
             {statusHistory.length === 0 ? (
-              <p className="text-sm text-zinc-500">No status changes yet.</p>
+              <p className="text-sm text-fg-subtle">No status changes yet.</p>
             ) : (
               statusHistory.map((entry: ProjectSubmissionStatusHistoryEntry) => (
-                <div key={entry.id} className="flex flex-wrap items-start gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                <div key={entry.id} className="flex flex-wrap items-start gap-3 border-b border-border-subtle pb-3 last:border-0 last:pb-0">
                   <Badge>{entry.toStatus as ApplicationStatus}</Badge>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-fg-subtle">
                     {(() => {
                       const d = entry.createdAt ? new Date(entry.createdAt) : null;
                       return d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy HH:mm') : '—';
                     })()}
                   </span>
-                  {entry.note && <p className="w-full text-sm text-zinc-400">{entry.note}</p>}
+                  {entry.note && <p className="w-full text-sm text-fg-muted">{entry.note}</p>}
                 </div>
               ))
             )}
@@ -238,7 +238,7 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
 
       {isCompanyAdmin ? (
         <Card>
-          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-zinc-400">Update Status</h3>
+          <h3 className="mb-4 text-sm font-medium uppercase tracking-[0.12em] text-fg-muted">Update Status</h3>
           <form onSubmit={handleSubmit(onStatusSubmit)} className="space-y-4">
             <Select label="Decision" options={STATUS_OPTIONS} {...register('status')} error={errors.status?.message} />
             <Textarea
@@ -259,7 +259,7 @@ export default function ProjectSubmissionReviewPage(): JSX.Element {
           </form>
         </Card>
       ) : (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-400">
+        <div className="rounded-xl border border-border-subtle bg-surface-tint px-4 py-3 text-sm text-fg-muted">
           Read-only view. Only company admins can update submission status.
         </div>
       )}

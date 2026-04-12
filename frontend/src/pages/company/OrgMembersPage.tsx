@@ -134,7 +134,7 @@ export default function OrgMembersPage(): JSX.Element {
     {
       key: 'email',
       header: 'Email',
-      render: (row) => <span className="text-zinc-300">{row.email}</span>,
+      render: (row) => <span className="text-fg-muted">{row.email}</span>,
     },
     {
       key: 'role',
@@ -164,7 +164,7 @@ export default function OrgMembersPage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
           <h1 className="ef-heading-gradient text-4xl font-semibold leading-tight md:text-5xl">
             Organization Members
@@ -173,13 +173,13 @@ export default function OrgMembersPage(): JSX.Element {
             Invite Member
           </Button>
         </div>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Manage who has access to your organization.
         </p>
       </header>
 
       {isLoading ? (
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       ) : (
         <DataTable columns={columns} data={tableData} emptyMessage="No members yet" />
       )}
@@ -191,24 +191,24 @@ export default function OrgMembersPage(): JSX.Element {
         </CardHeader>
 
         {joinRequestsLoading ? (
-          <div className="h-24 animate-pulse rounded-xl bg-white/5" />
+          <div className="h-24 animate-pulse rounded-xl bg-surface-tint" />
         ) : pendingJoinRequests.length === 0 ? (
-          <p className="text-sm text-zinc-500">No pending requests.</p>
+          <p className="text-sm text-fg-subtle">No pending requests.</p>
         ) : (
           <div className="space-y-3">
             {pendingJoinRequests.map((request) => (
               <div
                 key={request.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface px-3 py-2.5"
               >
                 <div className="space-y-0.5">
-                  <p className="text-sm text-zinc-200">{getRequesterName(request)}</p>
-                  <p className="text-xs text-zinc-500">{request.user?.email}</p>
+                  <p className="text-sm text-fg">{getRequesterName(request)}</p>
+                  <p className="text-xs text-fg-subtle">{request.user?.email}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="ghost"
-                    className="text-xs text-zinc-300 hover:text-white"
+                    className="text-xs text-fg-muted hover:text-fg"
                     onClick={() => setReviewTarget({ id: request.id, action: 'REJECT' })}
                   >
                     Reject

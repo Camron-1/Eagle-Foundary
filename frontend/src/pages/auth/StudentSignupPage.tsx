@@ -56,9 +56,9 @@ export default function StudentSignupPage(): JSX.Element {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Student</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Student</p>
       <h1 className="ef-heading-gradient mt-2 text-2xl font-semibold md:text-3xl">Create your account</h1>
-      <p className="mt-2 text-sm text-zinc-400">Launch startups and join teams on Eagle-Foundry.</p>
+      <p className="mt-2 text-sm text-fg-muted">Launch startups and join teams on Eagle-Foundry.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -73,9 +73,9 @@ export default function StudentSignupPage(): JSX.Element {
         </Button>
       </form>
 
-      <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-400">
-        <Link to="/login" className="underline underline-offset-4 hover:text-white">Already have an account?</Link>
-        <Link to="/sign-up" className="underline underline-offset-4 hover:text-white">Choose a different role</Link>
+      <div className="mt-5 flex flex-wrap gap-4 text-sm text-fg-muted">
+        <Link to="/login" className="underline underline-offset-4 hover:text-fg">Already have an account?</Link>
+        <Link to="/sign-up" className="underline underline-offset-4 hover:text-fg">Choose a different role</Link>
       </div>
     </div>
   );

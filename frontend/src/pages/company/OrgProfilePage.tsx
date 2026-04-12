@@ -98,7 +98,7 @@ export default function OrgProfilePage(): JSX.Element {
         <header>
           <h1 className="ef-heading-gradient text-4xl font-semibold">Organization Profile</h1>
         </header>
-        <div className="h-64 animate-pulse rounded-2xl bg-white/5" />
+        <div className="h-64 animate-pulse rounded-2xl bg-surface-tint" />
       </div>
     );
   }
@@ -106,7 +106,7 @@ export default function OrgProfilePage(): JSX.Element {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-zinc-400">Company</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-fg-muted">Company</p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <h1 className="ef-heading-gradient text-4xl font-semibold leading-tight md:text-5xl">
             Organization Profile
@@ -115,7 +115,7 @@ export default function OrgProfilePage(): JSX.Element {
             <Badge variant="success">Verified</Badge>
           )}
         </div>
-        <p className="mt-3 max-w-3xl text-sm text-zinc-300 md:text-base">
+        <p className="mt-3 max-w-3xl text-sm text-fg-muted md:text-base">
           Manage your organization details and branding.
         </p>
       </header>

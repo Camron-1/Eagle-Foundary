@@ -1,14 +1,178 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
+/*
+  Theme tokens — plug-and-play: copy html[data-theme="dark"] → html[data-theme="ocean"]
+  and change only values; keep variable names identical.
+*/
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #030303;
-  --foreground: #f4f4f5;
-  --muted: #a1a1aa;
-  --border: rgba(255, 255, 255, 0.14);
+:root,
+html[data-theme='dark'] {
+  /* Page & backdrop */
+  --color-page: #030303;
+  --color-blob-a: rgba(85, 108, 255, 0.18);
+  --color-blob-b: rgba(255, 255, 255, 0.15);
+  --color-grid-line: rgba(255, 255, 255, 0.06);
+  --landing-grid-opacity: 0.1;
+
+  /* Text */
+  --color-fg: #f4f4f5;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-subtle: #71717a;
+  --color-fg-inverse: #09090b;
+
+  /* Surfaces */
+  --color-surface: rgba(0, 0, 0, 0.45);
+  --color-surface-elevated: rgba(8, 8, 12, 0.88);
+  --color-surface-muted: rgba(255, 255, 255, 0.05);
+  --color-surface-input: rgba(0, 0, 0, 0.6);
+  --color-surface-tint: rgba(255, 255, 255, 0.06);
+  --color-surface-tint-strong: rgba(255, 255, 255, 0.1);
+  --color-surface-faint: rgba(255, 255, 255, 0.02);
+  --color-panel: rgba(9, 9, 11, 0.82);
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.14);
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+  --color-border-input: rgba(255, 255, 255, 0.12);
+
+  /* Controls & focus */
+  --color-ring: rgba(255, 255, 255, 0.25);
+  --color-ring-strong: rgba(255, 255, 255, 0.45);
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-overlay-heavy: rgba(0, 0, 0, 0.7);
+
+  /* Brand / accent */
+  --color-accent: #556cff;
+  --color-accent-fg: #09090b;
+  --color-hero-rim-glow: rgba(46, 88, 255, 0.22);
+
+  /* Legacy aliases (tailwind background, foreground, muted) */
+  --background: var(--color-page);
+  --foreground: var(--color-fg);
+  --muted: var(--color-fg-muted);
+  --border: var(--color-border);
+
+  /* Heading gradient (text) */
+  --heading-gradient: linear-gradient(180deg, #ffffff 0%, #f3f4f6 38%, #a4a6ad 100%);
+  --heading-shadow: rgba(255, 255, 255, 0.08);
+
+  /* Glass card */
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-bg-top: rgba(255, 255, 255, 0.08);
+  --glass-bg-mid: rgba(255, 255, 255, 0.01);
+  --glass-bg-bottom: rgba(255, 255, 255, 0.05);
+  --glass-base: rgba(8, 8, 12, 0.88);
+
+  /* Buttons (.ef-button) */
+  --btn-default-fill: #171717;
+  --btn-default-fill-hover: #1f1f1f;
+  --btn-default-border: rgba(255, 255, 255, 0.25);
+  --btn-primary-fill: #ffffff;
+  --btn-primary-fill-hover: #e4e4e7;
+  --btn-primary-border: rgba(255, 255, 255, 0.62);
+  --btn-primary-shadow: rgba(255, 255, 255, 0.25);
+  --btn-ghost-fill: rgba(10, 10, 10, 0.84);
+  --btn-ghost-fill-hover: #09090b;
+  --btn-ghost-border: rgba(255, 255, 255, 0.2);
+  --btn-outline-fill: transparent;
+  --btn-outline-fill-hover: rgba(255, 255, 255, 0.1);
+  --btn-outline-border: rgba(255, 255, 255, 0.3);
+  --btn-border-spin: rgba(255, 255, 255, 0.94);
+
+  /* Cards & elevation */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 120px rgba(255, 255, 255, 0.12);
+
+  /* Hero cube (landing) */
+  --cube-face-border: rgba(255, 255, 255, 0.34);
+  --cube-face-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
+  --cube-tile-border: rgba(255, 255, 255, 0.32);
+  --cube-tile-bg: linear-gradient(170deg, rgba(250, 250, 252, 0.95), rgba(145, 145, 155, 0.55));
+
+  /* Selection */
+  --color-selection: rgba(255, 255, 255, 0.22);
+  --stroke-decorative: rgba(255, 255, 255, 0.3);
+}
+
+html[data-theme='light'] {
+  --color-page: #fafafa;
+  --color-blob-a: rgba(85, 108, 255, 0.08);
+  --color-blob-b: rgba(15, 23, 42, 0.06);
+  --color-grid-line: rgba(15, 23, 42, 0.08);
+  --landing-grid-opacity: 0.35;
+
+  --color-fg: #18181b;
+  --color-fg-muted: #52525b;
+  --color-fg-subtle: #71717a;
+  --color-fg-inverse: #fafafa;
+
+  --color-surface: rgba(255, 255, 255, 0.72);
+  --color-surface-elevated: rgba(255, 255, 255, 0.92);
+  --color-surface-muted: rgba(15, 23, 42, 0.04);
+  --color-surface-input: rgba(255, 255, 255, 0.95);
+  --color-surface-tint: rgba(15, 23, 42, 0.05);
+  --color-surface-tint-strong: rgba(15, 23, 42, 0.09);
+  --color-surface-faint: rgba(15, 23, 42, 0.03);
+  --color-panel: rgba(255, 255, 255, 0.94);
+
+  --color-border: rgba(15, 23, 42, 0.12);
+  --color-border-subtle: rgba(15, 23, 42, 0.08);
+  --color-border-strong: rgba(15, 23, 42, 0.18);
+  --color-border-input: rgba(15, 23, 42, 0.14);
+
+  --color-ring: rgba(85, 108, 255, 0.35);
+  --color-ring-strong: rgba(85, 108, 255, 0.5);
+  --color-overlay: rgba(15, 23, 42, 0.35);
+  --color-overlay-heavy: rgba(15, 23, 42, 0.45);
+
+  --color-accent: #4338ca;
+  --color-accent-fg: #fafafa;
+  --color-hero-rim-glow: rgba(85, 108, 255, 0.16);
+
+  --background: var(--color-page);
+  --foreground: var(--color-fg);
+  --muted: var(--color-fg-muted);
+  --border: var(--color-border);
+
+  --heading-gradient: linear-gradient(180deg, #18181b 0%, #3f3f46 45%, #52525b 100%);
+  --heading-shadow: rgba(15, 23, 42, 0.08);
+
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --glass-bg-top: rgba(255, 255, 255, 0.85);
+  --glass-bg-mid: rgba(255, 255, 255, 0.55);
+  --glass-bg-bottom: rgba(255, 255, 255, 0.75);
+  --glass-base: rgba(255, 255, 255, 0.82);
+
+  --btn-default-fill: #f4f4f5;
+  --btn-default-fill-hover: #e4e4e7;
+  --btn-default-border: rgba(15, 23, 42, 0.15);
+  --btn-primary-fill: #18181b;
+  --btn-primary-fill-hover: #27272a;
+  --btn-primary-border: rgba(15, 23, 42, 0.2);
+  --btn-primary-shadow: rgba(15, 23, 42, 0.12);
+  --btn-ghost-fill: rgba(255, 255, 255, 0.9);
+  --btn-ghost-fill-hover: #ffffff;
+  --btn-ghost-border: rgba(15, 23, 42, 0.12);
+  --btn-outline-fill: transparent;
+  --btn-outline-fill-hover: rgba(15, 23, 42, 0.06);
+  --btn-outline-border: rgba(15, 23, 42, 0.2);
+  --btn-border-spin: rgba(24, 24, 27, 0.85);
+
+  --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 80px rgba(85, 108, 255, 0.08);
+
+  --cube-face-border: rgba(15, 23, 42, 0.14);
+  --cube-face-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(228, 228, 231, 0.55));
+  --cube-tile-border: rgba(15, 23, 42, 0.12);
+  --cube-tile-bg: linear-gradient(170deg, rgba(250, 250, 252, 0.98), rgba(161, 161, 170, 0.42));
+
+  --color-selection: rgba(67, 56, 202, 0.18);
+  --stroke-decorative: rgba(15, 23, 42, 0.14);
 }
 
 * {
@@ -24,10 +188,10 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 20% -10%, rgba(85, 108, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 82% 5%, rgba(255, 255, 255, 0.15), transparent 30%),
-    var(--background);
-  color: var(--foreground);
+    radial-gradient(circle at 20% -10%, var(--color-blob-a), transparent 28%),
+    radial-gradient(circle at 82% 5%, var(--color-blob-b), transparent 30%),
+    var(--color-page);
+  color: var(--color-fg);
   font-family: 'Plus Jakarta Sans', 'Space Grotesk', sans-serif;
   text-rendering: optimizeLegibility;
 }
@@ -38,51 +202,50 @@ a {
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--color-selection);
 }
 
 .landing-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-image: linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
   background-size: 42px 42px;
 }
 
 .muted-divider {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-border-subtle);
 }
 
 .glass-card {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(
-      160deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.01) 48%,
-      rgba(255, 255, 255, 0.05) 100%
-    ),
-    rgba(8, 8, 12, 0.88);
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(160deg, var(--glass-bg-top) 0%, var(--glass-bg-mid) 48%, var(--glass-bg-bottom) 100%),
+    var(--glass-base);
   backdrop-filter: blur(16px);
 }
 
 .hero-rim {
-  box-shadow:
-    0 0 80px rgba(255, 255, 255, 0.1),
-    0 0 160px rgba(46, 88, 255, 0.22);
+  background: radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, 0.1), transparent 62%);
+  box-shadow: 0 0 80px rgba(255, 255, 255, 0.1), 0 0 160px var(--color-hero-rim-glow);
+}
+
+html[data-theme='light'] .hero-rim {
+  background: radial-gradient(ellipse at 50% 45%, rgba(15, 23, 42, 0.06), transparent 62%);
+  box-shadow: 0 0 80px rgba(15, 23, 42, 0.06), 0 0 160px var(--color-hero-rim-glow);
 }
 
 .ef-heading-gradient {
   color: transparent;
-  background-image: linear-gradient(180deg, #ffffff 0%, #f3f4f6 38%, #a4a6ad 100%);
+  background-image: var(--heading-gradient);
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 14px 32px rgba(255, 255, 255, 0.08);
+  text-shadow: 0 14px 32px var(--heading-shadow);
 }
 
 .ef-button {
   --gradient-angle: 0deg;
   --p: 10%;
-  --btn-fill: #171717;
-  --btn-fill-hover: #1f1f1f;
-  --btn-border: rgba(255, 255, 255, 0.25);
+  --btn-fill: var(--btn-default-fill);
+  --btn-fill-hover: var(--btn-default-fill-hover);
+  --btn-border: var(--btn-default-border);
   position: relative;
   isolation: isolate;
   border: 1px solid var(--btn-border);
@@ -100,28 +263,42 @@ a {
   }
 }
 
+/* Animated border: conic gradient is masked to the 1px ring only so it never bleeds through
+   semi-transparent fills (ghost/outline) as a second “inner” moving line. */
 .ef-button.with-border-effect {
   border: 1px solid transparent;
-  background: linear-gradient(var(--btn-fill), var(--btn-fill)) padding-box,
-    conic-gradient(
-        from var(--gradient-angle, 0deg),
-        transparent,
-        rgba(255, 255, 255, 0.94) var(--p),
-        transparent calc(var(--p) * 2)
-      )
-      border-box;
+  background: var(--btn-fill);
+}
+
+.ef-button.with-border-effect::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-sizing: border-box;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--gradient-angle, 0deg),
+    transparent,
+    var(--btn-border-spin) var(--p),
+    transparent calc(var(--p) * 2)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
   animation: button-border-rotate 3s linear infinite;
 }
 
 .ef-button.with-border-effect:hover {
-  background: linear-gradient(var(--btn-fill-hover), var(--btn-fill-hover)) padding-box,
-    conic-gradient(
-        from var(--gradient-angle, 0deg),
-        transparent,
-        rgba(255, 255, 255, 0.94) var(--p),
-        transparent calc(var(--p) * 2)
-      )
-      border-box;
+  background: var(--btn-fill-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-button.with-border-effect::before {
+    animation: none;
+  }
 }
 
 .ef-button.no-border-effect:hover {
@@ -130,22 +307,61 @@ a {
 }
 
 .ef-button-primary {
-  --btn-fill: #ffffff;
-  --btn-fill-hover: #e4e4e7;
-  --btn-border: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+  --btn-fill: var(--btn-primary-fill);
+  --btn-fill-hover: var(--btn-primary-fill-hover);
+  --btn-border: var(--btn-primary-border);
+  box-shadow: 0 0 20px var(--btn-primary-shadow);
 }
 
 .ef-button-ghost {
-  --btn-fill: rgba(10, 10, 10, 0.84);
-  --btn-fill-hover: #09090b;
-  --btn-border: rgba(255, 255, 255, 0.2);
+  --btn-fill: var(--btn-ghost-fill);
+  --btn-fill-hover: var(--btn-ghost-fill-hover);
+  --btn-border: var(--btn-ghost-border);
 }
 
 .ef-button-outline {
-  --btn-fill: transparent;
-  --btn-fill-hover: rgba(255, 255, 255, 0.1);
-  --btn-border: rgba(255, 255, 255, 0.3);
+  --btn-fill: var(--btn-outline-fill);
+  --btn-fill-hover: var(--btn-outline-fill-hover);
+  --btn-border: var(--btn-outline-border);
+}
+
+/* Card-style hover (same family as TrustStrip / .ef-card): lift, shadow, subtle inner edge */
+.ef-button.ef-button-ghost:hover:not(:disabled),
+.ef-button.ef-button-outline:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme='light'] .ef-button.ef-button-ghost:hover:not(:disabled),
+html[data-theme='light'] .ef-button.ef-button-outline:hover:not(:disabled) {
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.ef-button.ef-button-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card), 0 0 20px var(--btn-primary-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ef-button.ef-button-ghost:hover:not(:disabled),
+  .ef-button.ef-button-outline:hover:not(:disabled),
+  .ef-button.ef-button-primary:hover:not(:disabled),
+  .ef-button.ef-button-ghost:active:not(:disabled),
+  .ef-button.ef-button-outline:active:not(:disabled),
+  .ef-button.ef-button-primary:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+.ef-button.ef-button-ghost:active:not(:disabled),
+.ef-button.ef-button-outline:active:not(:disabled),
+.ef-button.ef-button-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: none;
 }
 
 @property --gradient-angle {
@@ -173,7 +389,7 @@ a {
 
 .ef-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-card);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -192,6 +408,11 @@ a {
   background: radial-gradient(800px circle at var(--x-px) var(--y-px), rgba(255, 255, 255, 0.28), transparent 40%);
 }
 
+html[data-theme='light'] .ef-card::before,
+html[data-theme='light'] .ef-card::after {
+  background: radial-gradient(800px circle at var(--x-px) var(--y-px), rgba(15, 23, 42, 0.08), transparent 40%);
+}
+
 .ef-card::before {
   z-index: 1;
   opacity: 0.58;
@@ -202,6 +423,10 @@ a {
   opacity: 0;
   transition: opacity 0.4s ease;
   background: radial-gradient(800px circle at var(--x-px) var(--y-px), rgba(255, 255, 255, 0.36), transparent 38%);
+}
+
+html[data-theme='light'] .ef-card::after {
+  background: radial-gradient(800px circle at var(--x-px) var(--y-px), rgba(15, 23, 42, 0.1), transparent 38%);
 }
 
 .ef-card:hover::after {
@@ -246,16 +471,20 @@ a {
   gap: 8px;
   padding: 10px;
   border-radius: 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--cube-face-border);
+  background: var(--cube-face-bg);
   box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.06);
   backface-visibility: hidden;
 }
 
+html[data-theme='light'] .hero-cube-face {
+  box-shadow: inset 0 0 40px rgba(15, 23, 42, 0.04);
+}
+
 .hero-cube-tile {
   border-radius: 0.72rem;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  background: linear-gradient(170deg, rgba(250, 250, 252, 0.95), rgba(145, 145, 155, 0.55));
+  border: 1px solid var(--cube-tile-border);
+  background: var(--cube-tile-bg);
 }
 
 .hero-cube-reflection {
@@ -326,22 +555,20 @@ a {
   }
 }
 
-/* Focus-visible ring for accessibility (buttons have their own; use for links, inputs, etc.) */
 .focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 2px var(--color-ring);
 }
 
 button:focus-visible,
 a:focus-visible,
-[role="button"]:focus-visible {
+[role='button']:focus-visible {
   outline: none;
 }
 
-/* Buttons already have focus-visible via component; ensure fallback for custom elements */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 2px var(--color-ring);
 }

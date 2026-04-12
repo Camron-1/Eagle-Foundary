@@ -82,7 +82,7 @@ export default function MyReportsPage(): JSX.Element {
       key: 'target',
       header: 'Target',
       render: (row) => (
-        <span className="text-zinc-300">
+        <span className="text-fg-muted">
           {row.targetType} / {String(row.targetId).slice(0, 8)}…
         </span>
       ),
@@ -93,7 +93,7 @@ export default function MyReportsPage(): JSX.Element {
       render: (row) => {
         const reason = row.reporterReason ?? '';
         const truncated = reason.length > 80 ? `${reason.slice(0, 80)}…` : reason;
-        return <span className="text-zinc-400">{truncated}</span>;
+        return <span className="text-fg-muted">{truncated}</span>;
       },
     },
     {
@@ -106,7 +106,7 @@ export default function MyReportsPage(): JSX.Element {
       header: 'Updated',
       render: (row) => {
         const d = row.updatedAt ? new Date(row.updatedAt) : null;
-        return <span className="text-zinc-500">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
+        return <span className="text-fg-subtle">{d && !isNaN(d.getTime()) ? format(d, 'MMM d, yyyy') : '—'}</span>;
       },
     },
   ];

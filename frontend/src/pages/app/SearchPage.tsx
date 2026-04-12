@@ -91,7 +91,7 @@ export default function SearchPage(): JSX.Element {
         <h1 className="ef-heading-gradient text-4xl font-semibold leading-tight md:text-5xl">
           Search
         </h1>
-        <p className="mt-3 max-w-2xl text-sm text-zinc-400">
+        <p className="mt-3 max-w-2xl text-sm text-fg-muted">
           Search across startups, opportunities, projects, students, and organizations.
         </p>
       </header>
@@ -124,7 +124,7 @@ export default function SearchPage(): JSX.Element {
         <div className="space-y-6">
           {(activeTab === 'All' || activeTab === 'Startups') && (Array.isArray(startups) ? startups : []).length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-fg-subtle">
                 Startups
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -137,9 +137,9 @@ export default function SearchPage(): JSX.Element {
                     onKeyDown={(e) => e.key === 'Enter' && navigate(getDetailPath(item))}
                   >
                     <Card interactive className="cursor-pointer">
-                      <p className="font-medium text-zinc-200">{item.title}</p>
+                      <p className="font-medium text-fg">{item.title}</p>
                       {item.subtitle && (
-                        <p className="mt-1 text-sm text-zinc-500">{item.subtitle}</p>
+                        <p className="mt-1 text-sm text-fg-subtle">{item.subtitle}</p>
                       )}
                     </Card>
                   </div>
@@ -149,7 +149,7 @@ export default function SearchPage(): JSX.Element {
           )}
           {(activeTab === 'All' || activeTab === 'Opportunities') && (Array.isArray(opportunities) ? opportunities : []).length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-fg-subtle">
                 Opportunities
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -162,9 +162,9 @@ export default function SearchPage(): JSX.Element {
                     onKeyDown={(e) => e.key === 'Enter' && navigate(getDetailPath(item))}
                   >
                     <Card interactive className="cursor-pointer">
-                      <p className="font-medium text-zinc-200">{item.title}</p>
+                      <p className="font-medium text-fg">{item.title}</p>
                       {item.subtitle && (
-                        <p className="mt-1 text-sm text-zinc-500">{item.subtitle}</p>
+                        <p className="mt-1 text-sm text-fg-subtle">{item.subtitle}</p>
                       )}
                     </Card>
                   </div>
@@ -174,7 +174,7 @@ export default function SearchPage(): JSX.Element {
           )}
           {(activeTab === 'All' || activeTab === 'Projects') && (Array.isArray(projects) ? projects : []).length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-fg-subtle">
                 Projects
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -187,9 +187,9 @@ export default function SearchPage(): JSX.Element {
                     onKeyDown={(e) => e.key === 'Enter' && navigate(getDetailPath(item))}
                   >
                     <Card interactive className="cursor-pointer">
-                      <p className="font-medium text-zinc-200">{item.title}</p>
+                      <p className="font-medium text-fg">{item.title}</p>
                       {item.subtitle && (
-                        <p className="mt-1 text-sm text-zinc-500">{item.subtitle}</p>
+                        <p className="mt-1 text-sm text-fg-subtle">{item.subtitle}</p>
                       )}
                     </Card>
                   </div>
@@ -199,7 +199,7 @@ export default function SearchPage(): JSX.Element {
           )}
           {(activeTab === 'All' || activeTab === 'Students') && (Array.isArray(students) ? students : []).length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-fg-subtle">
                 Students
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -212,9 +212,9 @@ export default function SearchPage(): JSX.Element {
                     onKeyDown={(e) => e.key === 'Enter' && navigate(getDetailPath(item))}
                   >
                     <Card interactive className="cursor-pointer">
-                      <p className="font-medium text-zinc-200">{item.title}</p>
+                      <p className="font-medium text-fg">{item.title}</p>
                       {item.subtitle && (
-                        <p className="mt-1 text-sm text-zinc-500">{item.subtitle}</p>
+                        <p className="mt-1 text-sm text-fg-subtle">{item.subtitle}</p>
                       )}
                     </Card>
                   </div>
@@ -224,7 +224,7 @@ export default function SearchPage(): JSX.Element {
           )}
           {(activeTab === 'All' || activeTab === 'Organizations') && (Array.isArray(orgs) ? orgs : []).length > 0 && (
             <section>
-              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-fg-subtle">
                 Organizations
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -237,9 +237,9 @@ export default function SearchPage(): JSX.Element {
                     onKeyDown={(e) => e.key === 'Enter' && navigate(getDetailPath(item))}
                   >
                     <Card interactive className="cursor-pointer">
-                      <p className="font-medium text-zinc-200">{item.title}</p>
+                      <p className="font-medium text-fg">{item.title}</p>
                       {item.subtitle && (
-                        <p className="mt-1 text-sm text-zinc-500">{item.subtitle}</p>
+                        <p className="mt-1 text-sm text-fg-subtle">{item.subtitle}</p>
                       )}
                     </Card>
                   </div>

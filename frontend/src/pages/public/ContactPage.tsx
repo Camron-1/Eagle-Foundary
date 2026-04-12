@@ -50,12 +50,15 @@ export default function ContactPage(): JSX.Element {
   };
 
   const inputClass =
-    'w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition-colors focus:border-white/25 focus:bg-white/8';
+    'w-full rounded-xl border border-border-subtle bg-surface-tint px-4 py-3 text-sm text-fg placeholder:text-fg-subtle outline-none transition-colors focus:border-border-strong focus:bg-surface-input';
 
   return (
-    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 landing-grid opacity-[0.14]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-white/10 blur-[220px]" />
+    <main ref={rootRef} onPointerMove={handlePointerMove} className="relative overflow-hidden bg-page text-fg">
+      <div
+        className="pointer-events-none absolute inset-0 landing-grid"
+        style={{ opacity: 'var(--landing-grid-opacity)' }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 top-[-30rem] mx-auto h-[52rem] w-[52rem] rounded-full bg-surface-tint-strong blur-[220px]" />
       <div className="pointer-events-none absolute left-[-20rem] top-[30rem] h-[35rem] w-[35rem] rounded-full bg-blue-500/15 blur-[180px]" />
 
       <div className="relative z-10">
@@ -69,13 +72,13 @@ export default function ContactPage(): JSX.Element {
             transition={{ duration: 0.8 }}
             className="mx-auto max-w-xl"
           >
-            <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-zinc-300">
+            <span className="mb-6 inline-block rounded-full border border-border-subtle bg-surface-tint px-4 py-1.5 text-xs text-fg-muted">
               Contact
             </span>
             <h1 className="ef-heading-gradient mb-5 text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
               Let's talk.
             </h1>
-            <p className="text-sm leading-relaxed text-zinc-400">
+            <p className="text-sm leading-relaxed text-fg-muted">
               Whether you're a student with a question, a company looking to partner, or a university
               wanting to integrate — we'd love to hear from you.
             </p>
@@ -95,13 +98,13 @@ export default function ContactPage(): JSX.Element {
                 onClick={() => selectReason(reason.title)}
                 onKeyDown={(event) => handleReasonKeyDown(event, reason.title)}
                 aria-pressed={formState.type === reason.title}
-                className={`ef-card glass-card cursor-pointer rounded-2xl p-6 transition-colors ${formState.type === reason.title ? 'border-white/25' : ''}`}
+                className={`ef-card glass-card cursor-pointer rounded-2xl p-6 transition-colors ${formState.type === reason.title ? 'border-border-strong' : ''}`}
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                  <reason.icon size={18} className="text-zinc-300" />
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                  <reason.icon size={18} className="text-fg-muted" />
                 </div>
-                <h3 className="mb-1 text-sm font-semibold text-zinc-100">{reason.title}</h3>
-                <p className="text-xs leading-relaxed text-zinc-400">{reason.description}</p>
+                <h3 className="mb-1 text-sm font-semibold text-fg">{reason.title}</h3>
+                <p className="text-xs leading-relaxed text-fg-muted">{reason.description}</p>
               </motion.button>
             ))}
           </div>
@@ -123,34 +126,34 @@ export default function ContactPage(): JSX.Element {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                    <Mail size={16} className="text-zinc-300" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                    <Mail size={16} className="text-fg-muted" />
                   </div>
                   <div>
-                    <div className="mb-0.5 text-sm font-medium text-zinc-200">Email us</div>
-                    <a href="mailto:hello@eagle-foundry.com" className="text-xs text-zinc-400 transition-colors hover:text-zinc-200">
+                    <div className="mb-0.5 text-sm font-medium text-fg">Email us</div>
+                    <a href="mailto:hello@eagle-foundry.com" className="text-xs text-fg-muted transition-colors hover:text-fg">
                       hello@eagle-foundry.com
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                    <MessageSquare size={16} className="text-zinc-300" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-surface-tint">
+                    <MessageSquare size={16} className="text-fg-muted" />
                   </div>
                   <div>
-                    <div className="mb-0.5 text-sm font-medium text-zinc-200">Response time</div>
-                    <p className="text-xs text-zinc-400">We typically reply within 1–2 business days.</p>
+                    <div className="mb-0.5 text-sm font-medium text-fg">Response time</div>
+                    <p className="text-xs text-fg-muted">We typically reply within 1–2 business days.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-                <div className="mb-3 text-sm font-semibold text-zinc-200">Already have an account?</div>
-                <p className="mb-4 text-xs text-zinc-400">
+              <div className="mt-10 rounded-2xl border border-border-subtle bg-surface-tint p-6">
+                <div className="mb-3 text-sm font-semibold text-fg">Already have an account?</div>
+                <p className="mb-4 text-xs text-fg-muted">
                   Reach our support team directly from inside the platform for faster responses.
                 </p>
-                <Link to="/login" className="text-xs text-zinc-300 underline underline-offset-4 transition-colors hover:text-white">
+                <Link to="/login" className="text-xs text-fg-muted underline underline-offset-4 transition-colors hover:text-fg">
                   Sign in to get help →
                 </Link>
               </div>
@@ -166,17 +169,17 @@ export default function ContactPage(): JSX.Element {
             >
               {submitted ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                    <Send size={22} className="text-zinc-200" />
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-border-subtle bg-surface-tint">
+                    <Send size={22} className="text-fg" />
                   </div>
-                  <h3 className="mb-2 text-lg font-semibold text-zinc-100">Email client opened</h3>
-                  <p className="text-sm text-zinc-400">Your email client has been opened. Please complete sending in your email app.</p>
+                  <h3 className="mb-2 text-lg font-semibold text-fg">Email client opened</h3>
+                  <p className="text-sm text-fg-muted">Your email client has been opened. Please complete sending in your email app.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="contact-name" className="mb-1.5 block text-xs text-zinc-400">Name</label>
+                      <label htmlFor="contact-name" className="mb-1.5 block text-xs text-fg-muted">Name</label>
                       <input
                         id="contact-name"
                         className={inputClass}
@@ -186,7 +189,7 @@ export default function ContactPage(): JSX.Element {
                       />
                     </div>
                     <div>
-                      <label htmlFor="contact-email" className="mb-1.5 block text-xs text-zinc-400">Email</label>
+                      <label htmlFor="contact-email" className="mb-1.5 block text-xs text-fg-muted">Email</label>
                       <input
                         id="contact-email"
                         className={inputClass}
@@ -198,7 +201,7 @@ export default function ContactPage(): JSX.Element {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="contact-subject" className="mb-1.5 block text-xs text-zinc-400">Subject</label>
+                    <label htmlFor="contact-subject" className="mb-1.5 block text-xs text-fg-muted">Subject</label>
                     <input
                       id="contact-subject"
                       className={inputClass}
@@ -208,7 +211,7 @@ export default function ContactPage(): JSX.Element {
                     />
                   </div>
                   <div>
-                    <label htmlFor="contact-message" className="mb-1.5 block text-xs text-zinc-400">Message</label>
+                    <label htmlFor="contact-message" className="mb-1.5 block text-xs text-fg-muted">Message</label>
                     <textarea
                       id="contact-message"
                       className={`${inputClass} h-36 resize-none`}

@@ -25,14 +25,14 @@ export function FilterBar({ searchValue, onSearchChange, searchPlaceholder = 'Se
     <div className={cn('flex flex-wrap items-center gap-3', className)}>
       {onSearchChange && (
         <div className="relative flex-1 sm:max-w-xs">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <input
             type="text"
             value={searchValue ?? ''}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder ?? 'Search'}
-            className="w-full rounded-xl border border-white/12 bg-black/60 py-2 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20 hover:border-white/20"
+            className="w-full rounded-xl border border-border-input bg-surface-input py-2 pl-9 pr-3 text-sm text-fg placeholder:text-fg-subtle transition-colors focus:outline-none focus:ring-2 focus:ring-ring hover:border-border-strong"
           />
         </div>
       )}
@@ -43,7 +43,7 @@ export function FilterBar({ searchValue, onSearchChange, searchPlaceholder = 'Se
           value={f.value}
           onChange={(e) => f.onChange(e.target.value)}
           aria-label={f.label}
-          className="appearance-none rounded-xl border border-white/12 bg-black/60 px-3 py-2 text-xs text-zinc-300 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20 hover:border-white/20"
+          className="appearance-none rounded-xl border border-border-input bg-surface-input px-3 py-2 text-xs text-fg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring hover:border-border-strong"
         >
           <option value="">{f.label}</option>
           {f.options.map((opt) => (

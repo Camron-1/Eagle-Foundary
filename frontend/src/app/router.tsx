@@ -84,7 +84,7 @@ const FundingPage     = lazy(() => import('@/pages/public/FundingPage'));
 
 function RootLayout(): JSX.Element {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-black" />}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-page" />}>
       <Outlet />
       <ToastContainer />
       <CommandPalette />
