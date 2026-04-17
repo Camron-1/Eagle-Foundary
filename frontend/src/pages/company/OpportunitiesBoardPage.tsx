@@ -73,7 +73,30 @@ export default function OpportunitiesBoardPage(): JSX.Element {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <span className="text-xs text-fg-subtle">View / Edit</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            withBorderEffect={false}
+            className="h-8 px-3 py-1 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/opportunities/${row.id}`);
+            }}
+          >
+            View
+          </Button>
+          <Button
+            variant="ghost"
+            withBorderEffect={false}
+            className="h-8 px-3 py-1 text-xs bg-surface-faint hover:bg-surface-faint border border-border-subtle"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/company/opportunities/${row.id}/edit`);
+            }}
+          >
+            Edit
+          </Button>
+        </div>
       ),
     },
   ];
@@ -146,7 +169,6 @@ export default function OpportunitiesBoardPage(): JSX.Element {
         <DataTable
           columns={columns}
           data={tableData}
-          onRowClick={(row) => navigate(`/company/opportunities/${row.id}/edit`)}
         />
       )}
     </div>
