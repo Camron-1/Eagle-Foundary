@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as projectsController from './projects.controller.js';
 import { validateBody, validateParams, uuidParamSchema } from '../../middlewares/validate.js';
 import { authMiddleware, requireActiveUser } from '../../middlewares/auth.js';
-import { requireCompanyAdmin, requireCompanyMember } from '../../middlewares/rbac.js';
+import { requireCompanyMember, requireOrgPermission } from '../../middlewares/rbac.js';
 import { createProjectSchema, updateProjectSchema } from './projects.validators.js';
 
 const router = Router();
@@ -14,19 +14,19 @@ router.get('/:id', validateParams(uuidParamSchema), projectsController.getProjec
 router.use(authMiddleware);
 router.use(requireActiveUser);
 
-router.post('/', requireCompanyAdmin, validateBody(createProjectSchema), projectsController.createProject);
+router.post('/', requireOrgPermission('canManageProjects'), validateBody(createProjectSchema), projectsController.createProject);
 
 router.patch(
     '/:id',
-    requireCompanyAdmin,
+    requireOrgPermission('canManageProjects'),
     validateParams(uuidParamSchema),
     validateBody(updateProjectSchema),
     projectsController.updateProject
 );
 
-router.post('/:id/publish', requireCompanyAdmin, validateParams(uuidParamSchema), projectsController.publishProject);
+router.post('/:id/publish', requireOrgPermission('canManageProjects'), validateParams(uuidParamSchema), projectsController.publishProject);
 
-router.post('/:id/close', requireCompanyAdmin, validateParams(uuidParamSchema), projectsController.closeProject);
+router.post('/:id/close', requireOrgPermission('canManageProjects'), validateParams(uuidParamSchema), projectsController.closeProject);
 
 router.get('/org/me', requireCompanyMember, projectsController.listOrgProjects);
 

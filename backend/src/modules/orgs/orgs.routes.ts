@@ -2,13 +2,14 @@ import { Router } from 'express';
 import * as orgsController from './orgs.controller.js';
 import { validateBody, validateParams, validateQuery } from '../../middlewares/validate.js';
 import { authMiddleware, requireActiveUser, optionalAuthMiddleware } from '../../middlewares/auth.js';
-import { requireCompanyAdmin, requireCompanyMember } from '../../middlewares/rbac.js';
+import { requireCompanyMember, requireOrgPermission } from '../../middlewares/rbac.js';
 import { z } from 'zod';
 import {
     addMemberSchema,
     listOrgJoinRequestsQuerySchema,
     reviewOrgJoinRequestSchema,
     updateOrgSchema,
+    updateMemberPermissionsSchema,
 } from './orgs.validators.js';
 
 const router = Router();
@@ -50,7 +51,7 @@ router.post(
     '/me/members',
     authMiddleware,
     requireActiveUser,
-    requireCompanyAdmin,
+    requireOrgPermission('canInviteMembers'),
     validateBody(addMemberSchema),
     orgsController.addMember
 );
@@ -59,16 +60,26 @@ router.delete(
     '/me/members/:memberId',
     authMiddleware,
     requireActiveUser,
-    requireCompanyAdmin,
+    requireOrgPermission('canManageMembers'),
     validateParams(memberIdParamSchema),
     orgsController.removeMember
+);
+
+router.patch(
+    '/me/members/:memberId/permissions',
+    authMiddleware,
+    requireActiveUser,
+    requireOrgPermission('canManageMembers'),
+    validateParams(memberIdParamSchema),
+    validateBody(updateMemberPermissionsSchema),
+    orgsController.updateMemberPermissions
 );
 
 router.get(
     '/me/join-requests',
     authMiddleware,
     requireActiveUser,
-    requireCompanyAdmin,
+    requireOrgPermission('canManageMembers'),
     validateQuery(listOrgJoinRequestsQuerySchema),
     orgsController.listOrgJoinRequests
 );
@@ -77,7 +88,7 @@ router.patch(
     '/me/join-requests/:id',
     authMiddleware,
     requireActiveUser,
-    requireCompanyAdmin,
+    requireOrgPermission('canManageMembers'),
     validateParams(joinRequestIdParamSchema),
     validateBody(reviewOrgJoinRequestSchema),
     orgsController.reviewOrgJoinRequest

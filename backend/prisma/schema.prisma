@@ -26,6 +26,7 @@ enum UserRole {
   STUDENT
   COMPANY_ADMIN
   COMPANY_MEMBER
+  COMPANY_VIEWER
   UNIVERSITY_ADMIN
 }
 
@@ -123,6 +124,7 @@ model User {
   // For company users
   orgId String?
   org   Org?    @relation(fields: [orgId], references: [id])
+  orgPermissions Json?
 
   // For students
   studentProfile StudentProfile?

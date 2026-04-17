@@ -1,4 +1,4 @@
-export type UserRole = 'STUDENT' | 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'UNIVERSITY_ADMIN';
+export type UserRole = 'STUDENT' | 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'COMPANY_VIEWER' | 'UNIVERSITY_ADMIN';
 export type UserStatus =
   | 'PENDING_OTP'
   | 'PENDING_ORG_VERIFICATION'
@@ -58,6 +58,14 @@ export interface User {
     firstName: string;
     lastName: string;
   } | null;
+  orgPermissions?: OrgPermissions | null;
+}
+
+export interface OrgPermissions {
+  canManageMembers?: boolean;
+  canInviteMembers?: boolean;
+  canManageOpportunities?: boolean;
+  canManageProjects?: boolean;
 }
 
 export interface StudentProfile {
@@ -503,7 +511,12 @@ export interface UpdateOrgPayload {
 
 export interface AddOrgMemberPayload {
   email: string;
-  role: 'COMPANY_ADMIN' | 'COMPANY_MEMBER';
+  role: 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'COMPANY_VIEWER';
+}
+
+export interface UpdateMemberPermissionsPayload {
+  role?: 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'COMPANY_VIEWER';
+  orgPermissions?: OrgPermissions | null;
 }
 
 export interface ReviewOrgJoinRequestPayload {

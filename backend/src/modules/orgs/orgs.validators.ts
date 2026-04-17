@@ -40,8 +40,19 @@ export const reviewOrgJoinRequestSchema = z.object({
     adminNote: z.string().max(500).optional().nullable(),
 });
 
+export const updateMemberPermissionsSchema = z.object({
+    role: z.enum(['COMPANY_ADMIN', 'COMPANY_MEMBER', 'COMPANY_VIEWER']).optional(),
+    orgPermissions: z.object({
+        canManageMembers: z.boolean().optional(),
+        canInviteMembers: z.boolean().optional(),
+        canManageOpportunities: z.boolean().optional(),
+        canManageProjects: z.boolean().optional(),
+    }).optional().nullable(),
+});
+
 export type UpdateOrgInput = z.infer<typeof updateOrgSchema>;
 export type AddMemberInput = z.infer<typeof addMemberSchema>;
 export type ListOrgsQuery = z.infer<typeof listOrgsQuerySchema>;
 export type ListOrgJoinRequestsQuery = z.infer<typeof listOrgJoinRequestsQuerySchema>;
 export type ReviewOrgJoinRequestInput = z.infer<typeof reviewOrgJoinRequestSchema>;
+export type UpdateMemberPermissionsInput = z.infer<typeof updateMemberPermissionsSchema>;

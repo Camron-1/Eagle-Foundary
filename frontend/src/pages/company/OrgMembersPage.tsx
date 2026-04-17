@@ -10,7 +10,9 @@ import type {
   OrgJoinRequest,
   ReviewOrgJoinRequestPayload,
   UserRole,
+  OrgPermissions,
 } from '@/lib/api/types';
+import { getEffectiveOrgPermissions } from '@/lib/utils/permissions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -27,11 +29,12 @@ interface OrgMember {
   email: string;
   role: UserRole;
   createdAt: string;
+  orgPermissions?: OrgPermissions | null;
 }
 
 const inviteSchema = z.object({
   email: z.string().email('Valid email is required'),
-  role: z.enum(['COMPANY_ADMIN', 'COMPANY_MEMBER']),
+  role: z.enum(['COMPANY_ADMIN', 'COMPANY_MEMBER', 'COMPANY_VIEWER']),
 });
 
 type InviteFormValues = z.infer<typeof inviteSchema>;
@@ -45,11 +48,137 @@ function getRequesterName(request: OrgJoinRequest): string {
   return request.user?.email ?? 'Unknown user';
 }
 
+function EditPermissionsModal({
+  member,
+  onClose,
+  onSave,
+  isPending
+}: {
+  member: OrgMember;
+  onClose: () => void;
+  onSave: (role: UserRole, perms: OrgPermissions | null) => void;
+  isPending: boolean;
+}) {
+  const [role, setRole] = useState<UserRole>(member.role);
+  
+  // Initialize with exact overrides from database but fallback defaults to UI nicely
+  // Actually, we should show the *effective* permissions disabled if they are derived.
+  const [perms, setPerms] = useState<OrgPermissions>(member.orgPermissions || {});
+
+  const effectivePerms = getEffectiveOrgPermissions({ ...member, role, orgPermissions: perms } as any);
+
+  const toggleOverride = (key: keyof OrgPermissions) => {
+    setPerms(prev => {
+      const next = { ...prev };
+      // By toggling, we invert the *effective* permission for this role.
+      // But we just store the explicit override in DB.
+      next[key] = !effectivePerms[key];
+      return next;
+    });
+  };
+
+  const isRoleAdmin = role === 'COMPANY_ADMIN';
+
+  return (
+    <Modal open onClose={onClose} title={`Edit Permissions: ${member.email}`}>
+      <div className="space-y-6">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-fg">Role</label>
+          <Select
+            options={[
+              { value: 'COMPANY_ADMIN', label: 'Company Admin' },
+              { value: 'COMPANY_MEMBER', label: 'Company Member (Mid-level)' },
+              { value: 'COMPANY_VIEWER', label: 'Company Viewer (Read-only)' },
+            ]}
+            value={role}
+            onChange={(e) => {
+              setRole(e.target.value as UserRole);
+              // reset perms overrides when role changes to avoid confusing states
+              setPerms({});
+            }}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-fg">Granular Permissions</label>
+          {isRoleAdmin && (
+            <p className="text-xs text-amber-500/80 mb-2">Admins automatically have all permissions. You cannot override these.</p>
+          )}
+
+          <div className="space-y-3 rounded-lg border border-border-subtle bg-surface-tint/50 p-4">
+            <PermissionToggle
+              label="Manage Organization Members"
+              description="Invite, remove, or modify roles of other members."
+              checked={!!effectivePerms.canManageMembers}
+              disabled={isRoleAdmin}
+              onChange={() => toggleOverride('canManageMembers')}
+            />
+            <PermissionToggle
+              label="Invite Members"
+              description="Send invitations to join the organization (requires admin approval if they lack manage permission)."
+              checked={!!effectivePerms.canInviteMembers}
+              disabled={isRoleAdmin}
+              onChange={() => toggleOverride('canInviteMembers')}
+            />
+            <PermissionToggle
+              label="Manage Opportunities"
+              description="Create, edit, and publish opportunities."
+              checked={!!effectivePerms.canManageOpportunities}
+              disabled={isRoleAdmin}
+              onChange={() => toggleOverride('canManageOpportunities')}
+            />
+            <PermissionToggle
+              label="Manage Projects"
+              description="Create, edit, and publish projects."
+              checked={!!effectivePerms.canManageProjects}
+              disabled={isRoleAdmin}
+              onChange={() => toggleOverride('canManageProjects')}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            withBorderEffect={false}
+            onClick={() => onSave(role, Object.keys(perms).length > 0 ? perms : null)}
+            disabled={isPending}
+          >
+            {isPending ? 'Saving...' : 'Save'}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function PermissionToggle({ label, description, checked, disabled, onChange }: any) {
+  return (
+    <label className={`flex items-start gap-3 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+      <input
+        type="checkbox"
+        className="mt-1 h-4 w-4 rounded border-border-strong bg-surface text-brand checked:border-brand checked:bg-brand focus:ring-brand focus:ring-offset-surface"
+        checked={checked}
+        disabled={disabled}
+        onChange={onChange}
+      />
+      <div>
+        <div className="text-sm font-medium text-fg">{label}</div>
+        <div className="text-xs text-fg-subtle">{description}</div>
+      </div>
+    </label>
+  );
+}
+
 export default function OrgMembersPage(): JSX.Element {
   const queryClient = useQueryClient();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<{ id: string; email: string } | null>(null);
   const [reviewTarget, setReviewTarget] = useState<{ id: string; action: 'APPROVE' | 'REJECT' } | null>(null);
+  const [editPermissionsTarget, setEditPermissionsTarget] = useState<OrgMember | null>(null);
 
   const { data: members = [], isLoading } = useQuery({
     queryKey: ['orgs', 'me', 'members'],
@@ -126,6 +255,24 @@ export default function OrgMembersPage(): JSX.Element {
     },
   });
 
+  const editPermissionsMutation = useMutation({
+    mutationFn: async (payload: { id: string; role: UserRole; orgPermissions: OrgPermissions | null }) => {
+      await api.patch(endpoints.orgs.updateMemberPermissions(payload.id), {
+        role: payload.role,
+        orgPermissions: payload.orgPermissions,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orgs', 'me', 'members'] });
+      toast.success('Permissions updated');
+      setEditPermissionsTarget(null);
+    },
+    onError: (err) => {
+      const apiErr = err instanceof ApiError ? err : parseApiError(err);
+      toast.error(apiErr.message);
+    },
+  });
+
   const onInvite = (values: InviteFormValues) => {
     inviteMutation.mutate({ email: values.email, role: values.role });
   };
@@ -145,16 +292,28 @@ export default function OrgMembersPage(): JSX.Element {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <Button
-          variant="ghost"
-          className="text-xs text-red-400 hover:text-red-300"
-          onClick={(e) => {
-            e.stopPropagation();
-            setRemoveTarget({ id: row.id, email: row.email });
-          }}
-        >
-          Remove
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            className="text-xs text-fg-muted hover:text-fg"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditPermissionsTarget(row as OrgMember);
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-xs text-red-400 hover:text-red-300"
+            onClick={(e) => {
+              e.stopPropagation();
+              setRemoveTarget({ id: row.id, email: row.email });
+            }}
+          >
+            Remove
+          </Button>
+        </div>
       ),
     },
   ];
@@ -241,7 +400,8 @@ export default function OrgMembersPage(): JSX.Element {
             label="Role"
             options={[
               { value: 'COMPANY_ADMIN', label: 'Company Admin' },
-              { value: 'COMPANY_MEMBER', label: 'Company Member' },
+              { value: 'COMPANY_MEMBER', label: 'Company Member (Mid-level)' },
+              { value: 'COMPANY_VIEWER', label: 'Company Viewer (Read-only)' },
             ]}
             {...register('role')}
             error={errors.role?.message}
@@ -256,6 +416,15 @@ export default function OrgMembersPage(): JSX.Element {
           </div>
         </form>
       </Modal>
+
+      {editPermissionsTarget && (
+        <EditPermissionsModal 
+          member={editPermissionsTarget}
+          onClose={() => setEditPermissionsTarget(null)}
+          onSave={(role, perms) => editPermissionsMutation.mutate({ id: editPermissionsTarget.id, role, orgPermissions: perms })}
+          isPending={editPermissionsMutation.isPending}
+        />
+      )}
 
       <ConfirmDialog
         open={!!removeTarget}

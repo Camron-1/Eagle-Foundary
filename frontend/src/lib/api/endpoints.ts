@@ -103,6 +103,7 @@ export const endpoints = {
     updateMe: '/api/orgs/me',
     members: '/api/orgs/me/members',
     removeMember: (memberId: string) => `/api/orgs/me/members/${memberId}`,
+    updateMemberPermissions: (memberId: string) => `/api/orgs/me/members/${memberId}/permissions`,
     joinRequests: '/api/orgs/me/join-requests',
     reviewJoinRequest: (id: string) => `/api/orgs/me/join-requests/${id}`,
   },

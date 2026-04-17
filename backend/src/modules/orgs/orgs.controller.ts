@@ -107,6 +107,30 @@ export async function removeMember(
 }
 
 /**
+ * PATCH /orgs/me/members/:memberId/permissions
+ */
+export async function updateMemberPermissions(
+    req: Request<{ memberId: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> {
+    try {
+        if (!req.user?.orgId) {
+            throw new AppError(ErrorCode.NOT_FOUND, 'Not part of an organization', 404);
+        }
+        await orgsService.updateMemberPermissions(
+            req.user.orgId,
+            req.user.userId,
+            req.params.memberId,
+            req.body
+        );
+        success(res, { message: 'Permissions updated successfully' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
  * GET /orgs/me/join-requests
  */
 export async function listOrgJoinRequests(

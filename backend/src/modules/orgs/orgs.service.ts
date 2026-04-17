@@ -12,7 +12,9 @@ import {
     ListOrgsQuery,
     ReviewOrgJoinRequestInput,
     UpdateOrgInput,
+    UpdateMemberPermissionsInput,
 } from './orgs.validators.js';
+import { getEffectiveOrgPermissions } from '../../utils/permissions.js';
 
 /**
  * Get current user's org
@@ -86,6 +88,10 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
         );
     }
 
+    const inviter = await db.user.findUnique({ where: { id: _inviterId } });
+    const effectivePerms = getEffectiveOrgPermissions(inviter!);
+    const canManageMembers = effectivePerms.canManageMembers;
+
     const existingUser = await db.user.findUnique({ where: { email } });
 
     if (existingUser) {
@@ -93,9 +99,15 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
             throw new AppError(ErrorCode.CONFLICT, 'User is already part of an organization', 409);
         }
 
-        await orgsRepo.addMember(orgId, existingUser.id, data.role as 'COMPANY_ADMIN' | 'COMPANY_MEMBER');
-
-        return { userId: existingUser.id, invited: false };
+        if (canManageMembers) {
+            await orgsRepo.addMember(orgId, existingUser.id, data.role as 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'COMPANY_VIEWER');
+            return { userId: existingUser.id, invited: false };
+        } else {
+            await db.orgJoinRequest.create({
+                data: { orgId, userId: existingUser.id, status: OrgJoinRequestStatus.PENDING }
+            });
+            return { userId: existingUser.id, invited: true, pendingApproval: true };
+        }
     }
 
     const tempPassword = await hashPassword(crypto.randomUUID());
@@ -105,10 +117,17 @@ export async function addMember(orgId: string, _inviterId: string, data: AddMemb
             email,
             passwordHash: tempPassword,
             role: data.role as UserRole,
-            status: UserStatus.PENDING_OTP,
-            orgId,
+            status: canManageMembers ? UserStatus.PENDING_OTP : UserStatus.PENDING_ORG_APPROVAL,
+            orgId: canManageMembers ? orgId : null,
         },
     });
+
+    if (!canManageMembers) {
+        await db.orgJoinRequest.create({
+            data: { orgId, userId: newUser.id, status: OrgJoinRequestStatus.PENDING }
+        });
+        return { userId: newUser.id, invited: true, pendingApproval: true };
+    }
 
     return { userId: newUser.id, invited: true };
 }
@@ -149,6 +168,44 @@ export async function removeMember(orgId: string, removerId: string, memberId: s
     }
 
     await orgsRepo.removeMember(memberId);
+}
+
+export async function updateMemberPermissions(
+    orgId: string,
+    updaterId: string,
+    memberId: string,
+    data: UpdateMemberPermissionsInput
+) {
+    const org = await orgsRepo.findById(orgId);
+    if (!org) throw new NotFoundError('Organization');
+
+    const member = await db.user.findUnique({ where: { id: memberId } });
+    if (!member || member.orgId !== orgId) throw new NotFoundError('Member');
+
+    if (memberId === updaterId && data.role && data.role !== member.role) {
+        throw new AppError(ErrorCode.CONFLICT, 'Cannot change your own role', 400);
+    }
+
+    if (member.role === UserRole.COMPANY_ADMIN && data.role && data.role !== UserRole.COMPANY_ADMIN) {
+        const adminCount = await orgsRepo.countAdmins(orgId);
+        if (adminCount <= 1) {
+            throw new AppError(
+                ErrorCode.CONFLICT,
+                'Cannot downgrade the last admin.',
+                400
+            );
+        }
+    }
+
+    await db.user.update({
+        where: { id: memberId },
+        data: {
+            role: data.role,
+            orgPermissions: data.orgPermissions ?? undefined,
+        },
+    });
+
+    return { success: true };
 }
 
 export async function listOrgJoinRequests(orgId: string, query: ListOrgJoinRequestsQuery) {

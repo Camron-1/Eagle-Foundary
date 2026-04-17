@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { error, ErrorCode } from '../utils/response.js';
-import { UserRole, UserRoleType } from '../config/constants.js';
+import { UserRole, UserRoleType, OrgPermissions } from '../config/constants.js';
+import { getEffectiveOrgPermissions } from '../utils/permissions.js';
 
 /**
  * Middleware factory to require specific roles
@@ -43,7 +44,8 @@ export const requireCompanyAdmin = requireRole(UserRole.COMPANY_ADMIN);
  */
 export const requireCompanyMember = requireRole(
     UserRole.COMPANY_ADMIN,
-    UserRole.COMPANY_MEMBER
+    UserRole.COMPANY_MEMBER,
+    UserRole.COMPANY_VIEWER
 );
 
 /**
@@ -87,8 +89,35 @@ export function isCompanyAdmin(user: Express.Request['user']): boolean {
 export function isCompanyMember(user: Express.Request['user']): boolean {
     return (
         hasRole(user, UserRole.COMPANY_ADMIN) ||
-        hasRole(user, UserRole.COMPANY_MEMBER)
+        hasRole(user, UserRole.COMPANY_MEMBER) ||
+        hasRole(user, UserRole.COMPANY_VIEWER)
     );
+}
+
+/**
+ * Require specific organization permission
+ */
+export function requireOrgPermission(permission: keyof OrgPermissions) {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        if (!req.user || !isCompanyMember(req.user)) {
+            error(res, ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
+            return;
+        }
+
+        const effectivePerms = getEffectiveOrgPermissions(req.user as unknown as import('@prisma/client').User);
+
+        if (!effectivePerms[permission]) {
+            error(
+                res,
+                ErrorCode.FORBIDDEN,
+                `Access denied. Missing permission: ${permission}`,
+                403
+            );
+            return;
+        }
+
+        next();
+    };
 }
 
 /**

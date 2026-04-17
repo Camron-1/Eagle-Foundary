@@ -130,7 +130,7 @@ export async function getMembers(orgId: string): Promise<OrgMemberData[]> {
 export async function addMember(
     orgId: string,
     userId: string,
-    role: 'COMPANY_ADMIN' | 'COMPANY_MEMBER'
+    role: 'COMPANY_ADMIN' | 'COMPANY_MEMBER' | 'COMPANY_VIEWER'
 ): Promise<void> {
     await db.user.update({
         where: { id: userId },

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as opportunitiesController from './opportunities.controller.js';
 import { validateBody, validateParams, uuidParamSchema } from '../../middlewares/validate.js';
 import { authMiddleware, requireActiveUser } from '../../middlewares/auth.js';
-import { requireCompanyAdmin } from '../../middlewares/rbac.js';
+import { requireCompanyMember, requireOrgPermission } from '../../middlewares/rbac.js';
 import { createOpportunitySchema, updateOpportunitySchema } from './opportunities.validators.js';
 
 const router = Router();
@@ -20,17 +20,17 @@ router.get(
 router.use(authMiddleware);
 router.use(requireActiveUser);
 
-// Company admin routes
+// Company routes
 router.post(
     '/',
-    requireCompanyAdmin,
+    requireOrgPermission('canManageOpportunities'),
     validateBody(createOpportunitySchema),
     opportunitiesController.createOpportunity
 );
 
 router.patch(
     '/:id',
-    requireCompanyAdmin,
+    requireOrgPermission('canManageOpportunities'),
     validateParams(uuidParamSchema),
     validateBody(updateOpportunitySchema),
     opportunitiesController.updateOpportunity
@@ -38,19 +38,19 @@ router.patch(
 
 router.post(
     '/:id/publish',
-    requireCompanyAdmin,
+    requireOrgPermission('canManageOpportunities'),
     validateParams(uuidParamSchema),
     opportunitiesController.publishOpportunity
 );
 
 router.post(
     '/:id/close',
-    requireCompanyAdmin,
+    requireOrgPermission('canManageOpportunities'),
     validateParams(uuidParamSchema),
     opportunitiesController.closeOpportunity
 );
 
 // Get org's opportunities
-router.get('/org/me', requireCompanyAdmin, opportunitiesController.listOrgOpportunities);
+router.get('/org/me', requireCompanyMember, opportunitiesController.listOrgOpportunities);
 
 export default router;

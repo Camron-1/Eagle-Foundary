@@ -14,6 +14,7 @@ export const UserRole = {
     STUDENT: 'STUDENT',
     COMPANY_ADMIN: 'COMPANY_ADMIN',
     COMPANY_MEMBER: 'COMPANY_MEMBER',
+    COMPANY_VIEWER: 'COMPANY_VIEWER',
     UNIVERSITY_ADMIN: 'UNIVERSITY_ADMIN',
 } as const;
 
@@ -209,3 +210,10 @@ export const EncryptionConstants = {
     DEFAULT_ENCRYPTION_VERSION: 1,
     MESSAGE_PREVIEW_REDACTED: 'New encrypted message',
 } as const;
+
+export interface OrgPermissions {
+    canManageMembers?: boolean;
+    canInviteMembers?: boolean;
+    canManageOpportunities?: boolean;
+    canManageProjects?: boolean;
+}
