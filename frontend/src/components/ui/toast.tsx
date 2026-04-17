@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { create } from 'zustand';
 import { X, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,12 +37,13 @@ export const toast = {
 const iconMap = { success: CheckCircle2, error: AlertTriangle, info: Info };
 const colorMap = { success: 'border-emerald-500/30 text-emerald-400', error: 'border-red-500/30 text-red-400', info: 'border-blue-500/30 text-blue-400' };
 
-function ToastItem({ item }: { item: ToastItem }): JSX.Element {
+const ToastItem = forwardRef<HTMLDivElement, { item: ToastItem }>(function ToastItem({ item }, ref) {
   const remove = useToastStore((s) => s.remove);
   const Icon = iconMap[item.type];
 
   return (
     <motion.div
+      ref={ref}
       layout
       role={item.type === 'info' ? 'status' : 'alert'}
       aria-live={item.type === 'info' ? 'polite' : 'assertive'}
@@ -65,7 +67,7 @@ function ToastItem({ item }: { item: ToastItem }): JSX.Element {
       </button>
     </motion.div>
   );
-}
+});
 
 export function ToastContainer(): JSX.Element {
   const toasts = useToastStore((s) => s.toasts);
